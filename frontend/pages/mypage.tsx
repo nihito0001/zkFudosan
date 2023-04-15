@@ -149,11 +149,11 @@ const MyPage: NextPageWithLayout = () => {
               {offers.length !== 0 &&
                 offers.map((offer: any) => {
                   return (
-                    <Grid key={offer.id.toString()} xs={4}>
+                    <Grid key={offer.id.toString()} xs={12} md={4}>
                       <OfferCard
                         listingId={offer.listingId.toString()}
                         offerId={offer.offerId.toString()}
-                        reservePrice={offer.price.toString()}
+                        price={offer.price.toString()}
                         offeror={offer.offeror}
                         offerStatus={offer.offerStatus}
                         buttonLabel="Detail"
