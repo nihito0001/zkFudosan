@@ -1,11 +1,12 @@
 import { Badge, Button, Text, Grid, Card } from '@nextui-org/react';
 import { formatLongLengthString } from '../../libs/formatLongLengthString';
+import { formatWeiToEth } from '../../libs/formatWeiToEth'
 
 const OfferCard = (props: any) => {
   const {
     listingId,
     offerId,
-    reservePrice,
+    price,
     offerStatus,
     offeror,
     buttonLabel,
@@ -49,9 +50,14 @@ const OfferCard = (props: any) => {
             Refunded
           </Badge>
         )}
-        <Grid xs={12} justify="center">
-          <Text b h2>
-            {reservePrice} ETH
+        <Grid xs={12} justify="center" css={{ pb: 0 }}>
+          <Text>
+            Offer price
+          </Text>
+        </Grid>
+        <Grid xs={12} justify="center" css={{ pt: 0 }}>
+          <Text b h3>
+            {formatWeiToEth(price)} ETH
           </Text>
         </Grid>
       </Card.Body>

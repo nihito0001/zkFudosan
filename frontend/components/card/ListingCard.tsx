@@ -1,5 +1,6 @@
 import { Badge, Button, Text, Grid, Card } from '@nextui-org/react';
 import { formatLongLengthString } from '../../libs/formatLongLengthString';
+import { formatWeiToEth } from '../../libs/formatWeiToEth'
 
 const ListingCard = (props: any) => {
   const {
@@ -35,9 +36,14 @@ const ListingCard = (props: any) => {
             Closed
           </Badge>
         )}
-        <Grid xs={12} justify="center">
-          <Text b h2>
-            {reservePrice} ETH
+        <Grid xs={12} justify="center" css={{ pb: 0 }}>
+          <Text>
+            Lowest price
+          </Text>
+        </Grid>
+        <Grid xs={12} justify="center" css={{ pt: 0 }}>
+          <Text b h3>
+            {formatWeiToEth(reservePrice)} ETH
           </Text>
         </Grid>
       </Card.Body>
