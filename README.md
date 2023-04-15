@@ -37,9 +37,6 @@ Deploy to taiko
 npx hardhat run scripts/deploy.ts --network taiko
 ```
 
-
-
-
 ## 🌟 Contributing
 
 ## 📡 License

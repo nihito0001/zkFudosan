@@ -1,27 +1,75 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Container,
   Text,
-  Input,
   Grid,
   Modal,
-  Textarea,
   Card,
   Spacer,
+  Loading
 } from '@nextui-org/react';
 import type { NextPageWithLayout } from '../pages/_app';
 import DefaultLayout from '../components/layouts/DefaultLayout';
+import useCreateListing from '../hooks/contracts/useCreateListing';
+import TextInputController from '../components/input/TextInputController';
+import { useForm, SubmitHandler } from 'react-hook-form';
+import type { CreateListingRequest } from '../hooks/contracts/useCreateListing';
+import { useWeb3React } from '@web3-react/core';
+import { etherScanUrl } from '../config/constants'
 
 const MyPage: NextPageWithLayout = () => {
+  const { active, library } = useWeb3React();
+  // use
+  const { createListing, loading, txRecipt } = useCreateListing();
   // close modal
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
   const openHandler = () => setVisible(true);
   const closeHandler = () => setVisible(false);
   // create listing modal
-  const [listing, setListing] = React.useState(false);
-  const createListingHandler = () => setListing(true);
+  const [listing, setListing] = useState(false);
+  const openListingHandler = () => setListing(true);
+  const createListingHandler = (req: any) => console.log(req);
   const closeListingHandler = () => setListing(false);
+  // Success modal
+  const [successModal, setSuccessModal] = useState<boolean>(false)
+
+  const { control, handleSubmit, reset } = useForm<CreateListingRequest>({
+    defaultValues: {
+      secondsUntilEndTime: '',
+      reservePrice: '',
+      detailText: '',
+    },
+  });
+
+  const onSubmit: SubmitHandler<CreateListingRequest> = async (data: CreateListingRequest) => {
+    console.log(data)
+    const tx = await createListing(data, library.getSigner())
+    console.log('tx: ', tx)
+  }
+
+  useEffect(() => {
+    if (txRecipt) {
+      reset()
+      setListing(false)
+      setSuccessModal(true)
+    }
+  }, [txRecipt]) 
+
+  
+  // 外部サイトに遷移
+  const openEtherScan = (tx: string) => {
+    window.open(`${etherScanUrl}/tx/${tx}`, '_blank')
+  }
+
+  const formatString = (str: string | null | undefined) => {
+    if (str) {
+      return `${str.slice(0, 6)}...${str.slice(
+        str.length - 4,
+        str.length
+      )}`;
+    }
+  };
 
   // id情報取得
   const getId = () => {
@@ -46,7 +94,7 @@ const MyPage: NextPageWithLayout = () => {
       <Container>
         <Grid.Container gap={2}>
           <Grid xs={12}>
-            <Button color="gradient" shadow onPress={createListingHandler}>
+            <Button color="gradient" disabled={!active} shadow onPress={openListingHandler}>
               create Listing
             </Button>
           </Grid>
@@ -135,12 +183,11 @@ const MyPage: NextPageWithLayout = () => {
 
       {/* create new listing modal */}
       <Modal
-        closeButton
         className="create-new-listing"
         aria-label="Create New Listing"
         open={listing}
-        onClose={closeListingHandler}
       >
+        <form onSubmit={handleSubmit(onSubmit)}>
         <Modal.Header>
           <Text id="moal-title" size={18} b>
             Create New Listing
@@ -148,38 +195,96 @@ const MyPage: NextPageWithLayout = () => {
         </Modal.Header>
 
         <Modal.Body>
-          <Input
-            label="Reserved Price"
-            clearable
-            bordered
-            fullWidth
-            color="secondary"
-            size="lg"
-            placeholder="Enter reserved price"
-            contentLeft={<Text>💳</Text>}
-          />
-          <Input
-            label="Duration"
-            clearable
-            bordered
-            fullWidth
-            color="secondary"
-            size="lg"
-            placeholder="Enter the days of duration"
-            contentLeft={<Text>📆</Text>}
-          />
-          <Text color="secondary">Detail</Text>
-          <Textarea
-            bordered
-            fullWidth
-            color="secondary"
-            size="lg"
-            placeholder="Enter reserved price"
-          />
+          <Grid.Container gap={2}>
+            <Grid xs={12}>
+              <TextInputController
+                name="secondsUntilEndTime"
+                label="Deadline"
+                control={control}
+                rules={{
+                  required: 'Please enter deadline',
+                  pattern: {
+                    value: /[0-9]{1,15}/,
+                    message: 'Please the enter number'
+                  }
+                }}
+                disabled={loading}
+                placeholder="Enter the deadline"
+              />
+            </Grid>
+            <Grid xs={12}>
+              <TextInputController
+                name="reservePrice"
+                label="Reserve price (wETH)"
+                control={control}
+                rules={{
+                  required: 'Please enter reserve price',
+                  pattern: {
+                    value: /[0-9]{1,3}/,
+                    message: 'Please enter the number'
+                  }
+                }}
+                disabled={loading}
+                placeholder="Enter reserve price"
+              />
+            </Grid>
+            <Grid xs={12}>
+              <TextInputController
+                name="detailText"
+                label="Detail"
+                control={control}
+                rules={{
+                  required: 'Please enter detail',
+                }}
+                disabled={loading}
+                placeholder="Enter the days of detail"
+              />
+            </Grid>
+          </Grid.Container>
         </Modal.Body>
         <Modal.Footer>
-          <Button auto color="secondary" shadow onPress={closeListingHandler}>
-            create Listing
+          {loading ? (
+            <Button auto color="secondary" disabled>
+              <Loading type="points" color="currentColor" size="sm" />
+            </Button>
+          ) : (
+            <>
+              <Button flat auto color="error" onPress={() => setListing(false)}>
+                Close
+              </Button>
+              <Button auto color="secondary" shadow type="submit">
+                Create Listing
+              </Button>
+            </>
+          )}
+        </Modal.Footer>
+        </form>
+      </Modal>
+
+      {/* success modal */}
+      <Modal
+        className="closed"
+        aria-label="Closed"
+        open={successModal}
+        onClose={() => setSuccessModal(false)}
+      >
+        <Modal.Header>
+          <Text id="moal-title" size={18} b>
+            Success!!
+          </Text>
+        </Modal.Header>
+        <Modal.Body>
+          <Grid.Container gap={2}>
+            <Grid xs={12} justify="center">
+              <Text onClick={() => openEtherScan(txRecipt?.transactionHash)}>
+                {`${etherScanUrl}${formatString(txRecipt?.transactionHash)}`}
+              </Text>
+            </Grid>
+          </Grid.Container>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button flat auto color="error" onPress={() => setSuccessModal(false)}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
