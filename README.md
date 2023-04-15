@@ -23,7 +23,7 @@ yarn frontend
 Deploy contract:
 
 ```bash
-Deploy
+Deploy to goerli
 npx hardhat run scripts/deploy.ts --network goerli
 
 Verify
@@ -31,7 +31,13 @@ npx hardhat verify 0xF54ecAd57EB1B28531499fFBb3C3877C9430FB88 0xa7a5fd8481b4e27f
 
 npx hardhat verify 0x7283Ce97cd13BDA62248b3e855F426E9F4A9Dd22 0xa7a5fd8481b4e27f5dd87c4eb9703b741a7f0000 https://example.com/ 0xe76ebe6edd1b54dd4267985312b504dcd1550000 --network goerli
 ```
+
+```bash
+Deploy to taiko
+npx hardhat run scripts/deploy.ts --network taiko
 ```
+
+
 
 
 ## 🌟 Contributing
