@@ -50,7 +50,7 @@ const HomePage: NextPageWithLayout = () => {
   );
 };
 
-HomePage.getLayout = function getLayout(page) {
+HomePage.setLayout = function getLayout(page) {
   return <DefaultLayout>{page}</DefaultLayout>;
 };
 

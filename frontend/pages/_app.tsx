@@ -10,7 +10,7 @@ import type { ReactElement, ReactNode } from 'react';
 const POLLING_INTERVAL = 12000;
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode;
+  setLayout?: (page: ReactElement) => ReactNode;
 };
 
 type AppPropsWithLayout = AppProps & {
@@ -18,7 +18,7 @@ type AppPropsWithLayout = AppProps & {
 };
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
-  const getLayout = Component.getLayout ?? ((page) => page);
+  const setLayout = Component.setLayout ?? ((page) => page);
 
   const theme = createTheme({
     type: 'dark',
@@ -34,7 +34,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Web3ReactProvider getLibrary={getLibrary}>
         <NextUIProvider theme={theme}>
-          <SSRProvider>{getLayout(<Component {...pageProps} />)}</SSRProvider>
+          <SSRProvider>{setLayout(<Component {...pageProps} />)}</SSRProvider>
         </NextUIProvider>
       </Web3ReactProvider>
     </>

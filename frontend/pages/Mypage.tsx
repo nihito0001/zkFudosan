@@ -52,7 +52,7 @@ const MyPage: NextPageWithLayout = () => {
   );
 };
 
-MyPage.getLayout = function getLayout(page) {
+MyPage.setLayout = function getLayout(page) {
   return <DefaultLayout>{page}</DefaultLayout>;
 };
 
