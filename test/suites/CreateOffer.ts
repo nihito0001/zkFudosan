@@ -10,8 +10,6 @@ export default function suite() {
     const listings = await zkFudosan
       .connect(fixtureData.accountForOffered)
       .getMyListings();
-    expect(listings.length).to.equal(1);
-
     const listingId = listings[0].listingId;
 
     // ここからが実際のテスト
@@ -35,5 +33,31 @@ export default function suite() {
 
   describe("Events", () => {});
 
-  describe("Transfers", () => {});
+  describe("Transfers", () => {
+    it("Should transfer the funds to the contract", async function () {
+      const { zkFudosan, fixtureData } = await loadFixture(deployFixture);
+
+      const listings = await zkFudosan
+        .connect(fixtureData.accountForOffered)
+        .getMyListings();
+      const listingId = listings[0].listingId;
+
+      const price = listings[0].reservePrice;
+
+      await expect(
+        zkFudosan
+          .connect(fixtureData.accountForOffer)
+          .createOffer(listingId, { value: price })
+      ).to.changeEtherBalances(
+        [
+          zkFudosan,
+          fixtureData.platformFeeRecipient,
+          fixtureData.accountForListing,
+          fixtureData.accountForOffered,
+          fixtureData.accountForOffer,
+        ],
+        [price, 0, 0, 0, -price]
+      );
+    });
+  });
 }
