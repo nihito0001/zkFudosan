@@ -14,6 +14,7 @@ import TextInputController from '../components/input/TextInputController';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import type { CreateListingRequest } from '../hooks/contracts/useCreateListing';
 import useMyListings from '../hooks/contracts/useGetMyListings';
+import useMyOffers from '../hooks/contracts/useGetMyOffers';
 import { useWeb3React } from '@web3-react/core';
 import ListingCard from '../components/card/ListingCard';
 import ListingDetailModal from '../components/modal/ListingDetailModal';
@@ -24,8 +25,13 @@ const MyPage: NextPageWithLayout = () => {
   // Use
   const { active, library } = useWeb3React();
   const { createListing, loading, txRecipt } = useCreateListing();
-  const { closeListing, loading: closeListingLoading, txRecipt: closeListingTxRecipt } = useCloseListing()
+  const {
+    closeListing,
+    loading: closeListingLoading,
+    txRecipt: closeListingTxRecipt,
+  } = useCloseListing();
   const { getMyListings, listings } = useMyListings();
+  const { getMyOffers, offers } = useMyOffers();
 
   // State
   const [listingId, setListingId] = useState<string>('');
@@ -62,16 +68,16 @@ const MyPage: NextPageWithLayout = () => {
   };
 
   const handlerCloseListing = async () => {
-    setResultModal(false)
-    setResultRecipt(null)
+    setResultModal(false);
+    setResultRecipt(null);
     await closeListing(listingId, library.getSigner());
     getMyListings(library.getSigner());
-    seListingDetailModal(false)
+    seListingDetailModal(false);
     setResultModal(true);
 
-    console.log(closeListingTxRecipt)
-    setResultRecipt(closeListingTxRecipt)
-  }
+    console.log(closeListingTxRecipt);
+    setResultRecipt(closeListingTxRecipt);
+  };
 
   useEffect(() => {
     if (txRecipt) {
@@ -84,6 +90,7 @@ const MyPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (active) {
       getMyListings(library.getSigner());
+      getMyOffers(library.getSigner());
     }
   }, [active]);
 
@@ -97,6 +104,7 @@ const MyPage: NextPageWithLayout = () => {
     <>
       <Container>
         <Grid.Container gap={2}>
+          {/* listings */}
           <Grid xs={12}>
             <Text h1 color="white">
               My Listing
@@ -118,6 +126,37 @@ const MyPage: NextPageWithLayout = () => {
 
               {listings.length !== 0 &&
                 listings.map((listing: any) => {
+                  return (
+                    <Grid key={listing.listingId.toString()} xs={4}>
+                      <ListingCard
+                        listingId={listing.listingId.toString()}
+                        reservePrice={listing.reservePrice.toString()}
+                        owner={listing.owner}
+                        listingStatus={listing.listingStatus}
+                        buttonLabel="Detail"
+                        handler={() =>
+                          openListingDetailModal(listing.listingId.toString())
+                        }
+                      />
+                    </Grid>
+                  );
+                })}
+            </Grid.Container>
+          </Grid>
+
+          {/* offers */}
+          <Grid xs={12}>
+            <Text h1 color="white">
+              My Offers
+            </Text>
+          </Grid>
+
+          <Grid xs={12}>
+            <Grid.Container gap={2}>
+              {offers.length === 0 && <p>Not data.</p>}
+
+              {offers.length !== 0 &&
+                offers.map((listing: any) => {
                   return (
                     <Grid key={listing.listingId.toString()} xs={4}>
                       <ListingCard
