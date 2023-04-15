@@ -34,7 +34,7 @@ const HomePage: NextPageWithLayout = () => {
               {activeListings.length !== 0 &&
                 activeListings.map((listing: any) => {
                   return (
-                    <Grid key={listing.listingId.toString()} xs={4}>
+                    <Grid key={listing.listingId.toString()} xs={12} md={4}>
                       <ListingCard
                         listingId={listing.listingId.toString()}
                         reservePrice={listing.reservePrice.toString()}
