@@ -21,7 +21,7 @@ const ListingDetailModal = (props: any) => {
   const { sendMessage } = useChat();
 
   const handleSendMessage = (listing: any) => {
-    sendMessage(listing.owner.address, 'Congratuations!! you got!');
+    sendMessage(listing.owner, 'Congratuations!! you got!');
   };
 
   useEffect(() => {
