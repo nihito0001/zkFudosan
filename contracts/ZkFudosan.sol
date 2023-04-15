@@ -18,8 +18,8 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     // listingId => Listing
     mapping(uint256 => Listing) private listings;
 
-    // listingId => offerId => Offer
-    mapping(uint256 => mapping(uint256 => Offer)) private offers;
+    // offerId => Offer
+    mapping(uint256 => Offer) private offers;
 
     // address => listingId[]
     mapping(address => uint256[]) private userListingIds;
@@ -61,6 +61,21 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
         return _myListings;
     }
 
+    function getMyOffers() external view returns (Offer[] memory) {
+        // オファーのIDの配列を取得します。
+        uint256[] memory offerIds = userOfferIds[msg.sender];
+
+        // オファーの配列を作成します。
+        Offer[] memory _myOffers = new Offer[](offerIds.length);
+
+        // オファーの配列を作成します。
+        for (uint256 i = 0; i < offerIds.length; i++) {
+            _myOffers[i] = offers[offerIds[i]];
+        }
+
+        return _myOffers;
+    }
+
     // getOffers: 指定したリスティングのオファー一覧を取得します。
     function getOffers(
         uint256 _listingId
@@ -72,7 +87,7 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
 
         // リスティングの配列を作成します。
         for (uint256 i = 0; i < offerIds.length; i++) {
-            _offers[i] = offers[_listingId][offerIds[i]];
+            _offers[i] = offers[offerIds[i]];
         }
 
         return _offers;
@@ -161,15 +176,21 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
         );
 
         // オファーを作成します。
-        Offer memory offer = Offer(offerId, _listingId, msg.sender, msg.value);
+        Offer memory offer = Offer(
+            offerId,
+            _listingId,
+            msg.sender,
+            msg.value,
+            OfferStatus.Active
+        );
 
         // オファーを保存します。
-        offers[_listingId][offerId] = offer;
+        offers[offerId] = offer;
         listingOfferIds[listing.listingId].push(offerId);
         userOfferIds[msg.sender].push(offerId);
 
         // オファーが作成されたことを通知します。
-        emit OfferAdded(_listingId, msg.sender, offer);
+        emit OfferAdded(offer);
     }
 
     // closeListing: リスティングを成立させます。
@@ -215,7 +236,7 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
         Offer memory highestPriceOffer;
         uint256 memoPrice = 0;
         for (uint256 i = 0; i < offerIds.length; i++) {
-            Offer memory offer = offers[_listingId][offerIds[i]];
+            Offer memory offer = offers[offerIds[i]];
 
             if (offer.price > memoPrice) {
                 highestPriceOffer = offer;
@@ -253,11 +274,44 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
         // TODO depositoを返金する
     }
 
-    // approve: リスティングを承認します。
-    function approve(uint256 _offerId) external nonReentrant {}
+    // approveOffer: リスティングを承認します。
+    function approveOffer(uint256 _offerId) external nonReentrant {
+        // オファーを取得します。
+        Offer memory offer = offers[_offerId];
+
+        // オファーが存在するか確認します。
+        require(offer.offerId != 0, "Offer does not exist");
+
+        // オファーのステータスがActiveか確認します。
+        require(offer.offerStatus == OfferStatus.Active, "Offer is not active");
+
+        // オファーのステータスをApprovedにします。
+        offer.offerStatus = OfferStatus.Approved;
+
+        // オファーを保存します。
+        offers[_offerId] = offer;
+
+        // ownerに送金します。
+        Listing memory listing = listings[offer.listingId];
+        payable(listing.owner).transfer(offer.price);
+
+        // depositを返金します。
+        uint256[] memory offerIds = listingOfferIds[offer.listingId];
+        for (uint256 i = 0; i < offerIds.length; i++) {
+            Offer memory _offer = offers[offerIds[i]];
+            if (_offer.offerStatus == OfferStatus.Active) {
+                payable(_offer.offeror).transfer(_offer.price);
+                offers[_offer.offerId].offerStatus = OfferStatus.Refunded;
+            }
+        }
+
+        // オファーが承認されたことを通知します。
+        emit OfferApproved(offer);
+    }
 
     // decline: リスティングを拒否します。
-    function decline(uint256 _listingId) external nonReentrant {}
+    // function decline(uint256 _listingId) external nonReentrant {}
+    // TODO
 
     // getPlatformFeeRecipient: プラットフォームの手数料を受け取るアドレスを取得します。
     function getPlatformFeeRecipient() external view returns (address) {

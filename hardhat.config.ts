@@ -6,32 +6,35 @@ dotenvConfig({ path: resolve(__dirname, "./.env") });
 
 import "@nomicfoundation/hardhat-toolbox";
 
-const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || ""
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || "";
 
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
-const ALLTHATNODE_API_KEY = process.env.ALLTHATNODE_API_KEY
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+const ALLTHATNODE_API_KEY = process.env.ALLTHATNODE_API_KEY;
 
 const chainIds = {
   mainnet: 1,
   goerli: 5,
   sepolia: 0,
-  scroll: 0
-}
+  scroll: 0,
+};
 
-const setNetworkConfig = (network: keyof typeof chainIds): NetworkUserConfig => {
-  const url = network !== 'scroll'
-    ? `https://ethereum-${network}-rpc.allthatnode.com/${ALLTHATNODE_API_KEY}`
-    : '';
+const setNetworkConfig = (
+  network: keyof typeof chainIds
+): NetworkUserConfig => {
+  const url =
+    network !== "scroll"
+      ? `https://ethereum-${network}-rpc.allthatnode.com/${ALLTHATNODE_API_KEY}`
+      : "";
 
   return {
     accounts: [DEPLOYER_PRIVATE_KEY],
     chainId: chainIds[network],
-    url
-  }
-}
+    url,
+  };
+};
 
 const config: HardhatUserConfig = {
-  defaultNetwork: "goerli",
+  // defaultNetwork: "goerli",
   networks: Object.keys(chainIds).reduce((acc: any, network: any) => {
     acc[network] = setNetworkConfig(network as keyof typeof chainIds);
     return acc;

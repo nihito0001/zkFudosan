@@ -45,12 +45,20 @@ interface IZkFudosan {
         address closer;
     }
 
+    enum OfferStatus {
+        Active,
+        Declined,
+        Approved,
+        Refunded
+    }
+
     // オファーの情報です。
     struct Offer {
         uint256 offerId;
         uint256 listingId;
         address offeror;
         uint256 price;
+        OfferStatus offerStatus;
     }
 
     // リスティングが作成されたときに発火します。
@@ -68,14 +76,15 @@ interface IZkFudosan {
     event ListingCancelled(uint256 indexed listingId, Listing listing);
 
     // リスティングにオファーがされたときに発火します。
-    event OfferAdded(
-        uint256 indexed listingId,
-        address indexed offeror,
-        Offer offer
-    );
+    event OfferAdded(Offer offer);
+
+    event OfferApproved(Offer offer);
 
     // getMyListings: 自分のリスティング一覧を取得します。
     function getMyListings() external view returns (Listing[] memory);
+
+    // getMyOffers: 自分のオファー一覧を取得します。
+    function getMyOffers() external view returns (Offer[] memory);
 
     // getAllActiveListings: アクティブなリスティングを取得します。(すべて)
     function getAllActiveListings() external view returns (Listing[] memory);
@@ -101,13 +110,14 @@ interface IZkFudosan {
     // - listingOwnerのみキャンセルできるようにする
     function cancelListing(uint256 _listingId) external;
 
-    // approve: リスティングを承認します。
+    // approveOffer: リスティングを承認します。
     // - listingに対して成立したオファーした人のみ承認できるようにする
     // - この際金額を送金します。
-    function approve(uint256 _offerId) external;
+    function approveOffer(uint256 _offerId) external;
 
     // decline: リスティングを拒否します。
-    function decline(uint256 _listingId) external;
+    // function decline(uint256 _listingId) external;
+    // TODO
 
     // getPlatformFeeRecipient: プラットフォームの手数料を受け取るアドレスを取得します。
     function getPlatformFeeRecipient() external view returns (address);

@@ -10,7 +10,7 @@ export default function suite() {
       .connect(fixtureData.accountForOffered)
       .getAllActiveListings();
 
-    expect(listings.length).to.equal(2);
+    expect(listings.length).to.equal(3);
   });
 
   describe("Validations", () => {});
