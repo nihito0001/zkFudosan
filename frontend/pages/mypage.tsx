@@ -96,11 +96,17 @@ const MyPage: NextPageWithLayout = () => {
       <Container>
         <Grid.Container gap={2}>
           {/* listings */}
-          <Grid xs={12}>
+          <Grid xs={12} css={{ paddingBottom: "0", marginBottom: "inherit" }}>
             <Text h1 color="white">
               My Listing
             </Text>
           </Grid>
+           <Grid xs={12} css={{ paddingTop: "0" }}>
+             <Text color='white'>
+                The list of mediation contracts that I have listed.<br/>
+ You can create a new listing and close (approve) mediation contracts that have received offers.
+            </Text>
+           </Grid>
           <Grid xs={12}>
             <Button
               color="gradient"
@@ -136,9 +142,15 @@ const MyPage: NextPageWithLayout = () => {
           </Grid>
 
           {/* offers */}
-          <Grid xs={12}>
+          <Grid xs={12} css={{ paddingBottom: "0", marginBottom: "inherit" }}>
             <Text h1 color="white">
               My Offers
+            </Text>
+          </Grid>
+          <Grid xs={12} css={{ paddingTop: "0" }}>
+            <Text color='white'>
+            The list of mediation contracts that I have offered.<br/>
+By "approve” the offered amount will be sent to the user who has accepted the mediation contract.
             </Text>
           </Grid>
 
