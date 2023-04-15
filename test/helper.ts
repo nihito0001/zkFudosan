@@ -13,6 +13,10 @@ export async function deployFixture() {
     accountForOffered,
     accountForOffer,
     accountForCloseListing,
+    accountForApproved,
+    accountForApprove,
+    accountForRefunded1,
+    accountForRefunded2,
   ] = await ethers.getSigners();
   const contractURI = "https://example.com";
 
@@ -34,6 +38,10 @@ export async function deployFixture() {
     accountForOffered,
     accountForOffer,
     accountForCloseListing,
+    accountForApproved,
+    accountForApprove,
+    accountForRefunded1,
+    accountForRefunded2,
   };
 
   // Prepare for create offer
@@ -58,6 +66,33 @@ export async function deployFixture() {
   await zkFudosan
     .connect(fixtureData.accountForOffer)
     .createOffer(listingId, { value: 1234 });
+
+  // Prepare for offer approval
+  await zkFudosan.connect(fixtureData.accountForApproved).createListing({
+    secondsUntilEndTime: 3600 * 2, // 2 hour
+    reservePrice: 300,
+    detailText: "hogehoge",
+  });
+  const listings2 = await zkFudosan
+    .connect(fixtureData.accountForApproved)
+    .getMyListings();
+  const listingId2 = listings2[0].listingId;
+
+  await zkFudosan
+    .connect(fixtureData.accountForRefunded1)
+    .createOffer(listingId2, { value: 300 });
+
+  await zkFudosan
+    .connect(fixtureData.accountForRefunded2)
+    .createOffer(listingId2, { value: 400 });
+
+  await zkFudosan
+    .connect(fixtureData.accountForApprove)
+    .createOffer(listingId2, { value: 500 });
+
+  await zkFudosan
+    .connect(fixtureData.accountForApproved)
+    .closeListing(listingId2);
 
   return {
     zkFudosan,
