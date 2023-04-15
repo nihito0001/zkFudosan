@@ -16,6 +16,7 @@ import type { CreateListingRequest } from '../hooks/contracts/useCreateListing';
 import useMyListings from '../hooks/contracts/useGetMyListings';
 import useMyOffers from '../hooks/contracts/useGetMyOffers';
 import { useWeb3React } from '@web3-react/core';
+import OfferCard from '../components/card/OfferCard';
 import ListingCard from '../components/card/ListingCard';
 import ListingDetailModal from '../components/modal/ListingDetailModal';
 import useCloseListing from '../hooks/contracts/useCloseListing';
@@ -146,18 +147,16 @@ const MyPage: NextPageWithLayout = () => {
               {offers.length === 0 && <p>Not data.</p>}
 
               {offers.length !== 0 &&
-                offers.map((listing: any) => {
+                offers.map((offer: any) => {
                   return (
-                    <Grid key={listing.listingId.toString()} xs={4}>
-                      <ListingCard
-                        listingId={listing.listingId.toString()}
-                        reservePrice={listing.reservePrice.toString()}
-                        owner={listing.owner}
-                        listingStatus={listing.listingStatus}
+                    <Grid key={offer.id.toString()} xs={4}>
+                      <OfferCard
+                        listingId={offer.listingId.toString()}
+                        offerId={offer.offerId.toString()}
+                        reservePrice={offer.price.toString()}
+                        offeror={offer.offeror}
+                        offerStatus={offer.offerStatus}
                         buttonLabel="Detail"
-                        handler={() =>
-                          openListingDetailModal(listing.listingId.toString())
-                        }
                       />
                     </Grid>
                   );

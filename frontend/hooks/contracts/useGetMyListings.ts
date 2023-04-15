@@ -37,6 +37,7 @@ const useGetMyListings = () => {
         return b.id - a.id;
       });
 
+      console.log('sortedListings', sortedListings)
       setListings(sortedListings);
       setLoading(false);
     } catch (error) {
