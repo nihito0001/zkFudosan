@@ -16,15 +16,20 @@ const chainIds = {
   goerli: 5,
   sepolia: 0,
   scroll: 0,
+  taiko: 167002,
 };
 
 const setNetworkConfig = (
   network: keyof typeof chainIds
 ): NetworkUserConfig => {
-  const url =
-    network !== "scroll"
-      ? `https://ethereum-${network}-rpc.allthatnode.com/${ALLTHATNODE_API_KEY}`
-      : "";
+  let url = "";
+  if (network === "scroll") {
+    url = ``;
+  } else if (network === "taiko") {
+    url = "https://l2rpc.hackathon.taiko.xyz";
+  } else {
+    url = `https://ethereum-${network}-rpc.allthatnode.com/${ALLTHATNODE_API_KEY}`;
+  }
 
   return {
     accounts: [DEPLOYER_PRIVATE_KEY],
