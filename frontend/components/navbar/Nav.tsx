@@ -5,10 +5,12 @@ import { connector } from '../../config/connectors';
 import { useWeb3React } from '@web3-react/core';
 import { WalletIcon } from './WalletIcon';
 import useEthBalance from '../../hooks/useEthBalance';
+import Link from 'next/link';
 
 export const Nav = () => {
   const { account, active, activate, deactivate } = useWeb3React();
   const { balance, loading, fetchEthBalance } = useEthBalance();
+  const router = useRouter();
 
   const formatAccount = (address: string | null | undefined) => {
     if (address) {
@@ -25,18 +27,26 @@ export const Nav = () => {
     }
   }, [account]);
 
-  const router = useRouter().pathname;
-
   return (
     <>
       <Navbar isBordered>
         <Text h1>zkFudosan</Text>
 
         <Navbar.Content>
-          <Navbar.Link isActive={router === '/'} href="/">
+          <Navbar.Link
+            variant="highlight"
+            isActive={router.pathname === '/'}
+            href="/"
+          >
             Listing
           </Navbar.Link>
-          <Navbar.Link isActive={router === '/Mypage'} href="/Mypage">MyPage</Navbar.Link>
+          <Navbar.Link
+            variant="highlight"
+            isActive={router.pathname === '/mypage'}
+            href="/mypage"
+          >
+            MyPage
+          </Navbar.Link>
         </Navbar.Content>
 
         <Navbar.Content>

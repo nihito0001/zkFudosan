@@ -130,23 +130,16 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "listingId",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "offeror",
-        "type": "address"
-      },
-      {
         "components": [
           { "internalType": "uint256", "name": "offerId", "type": "uint256" },
           { "internalType": "uint256", "name": "listingId", "type": "uint256" },
           { "internalType": "address", "name": "offeror", "type": "address" },
-          { "internalType": "uint256", "name": "price", "type": "uint256" }
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          {
+            "internalType": "enum IZkFudosan.OfferStatus",
+            "name": "offerStatus",
+            "type": "uint8"
+          }
         ],
         "indexed": false,
         "internalType": "struct IZkFudosan.Offer",
@@ -155,6 +148,30 @@
       }
     ],
     "name": "OfferAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "offerId", "type": "uint256" },
+          { "internalType": "uint256", "name": "listingId", "type": "uint256" },
+          { "internalType": "address", "name": "offeror", "type": "address" },
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          {
+            "internalType": "enum IZkFudosan.OfferStatus",
+            "name": "offerStatus",
+            "type": "uint8"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct IZkFudosan.Offer",
+        "name": "offer",
+        "type": "tuple"
+      }
+    ],
+    "name": "OfferApproved",
     "type": "event"
   },
   {
@@ -243,7 +260,7 @@
     "inputs": [
       { "internalType": "uint256", "name": "_offerId", "type": "uint256" }
     ],
-    "name": "approve",
+    "name": "approveOffer",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -309,15 +326,6 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_listingId", "type": "uint256" }
-    ],
-    "name": "decline",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
     "inputs": [],
     "name": "getAllActiveListings",
     "outputs": [
@@ -378,6 +386,30 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getMyOffers",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "offerId", "type": "uint256" },
+          { "internalType": "uint256", "name": "listingId", "type": "uint256" },
+          { "internalType": "address", "name": "offeror", "type": "address" },
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          {
+            "internalType": "enum IZkFudosan.OfferStatus",
+            "name": "offerStatus",
+            "type": "uint8"
+          }
+        ],
+        "internalType": "struct IZkFudosan.Offer[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "uint256", "name": "_listingId", "type": "uint256" }
     ],
@@ -388,7 +420,12 @@
           { "internalType": "uint256", "name": "offerId", "type": "uint256" },
           { "internalType": "uint256", "name": "listingId", "type": "uint256" },
           { "internalType": "address", "name": "offeror", "type": "address" },
-          { "internalType": "uint256", "name": "price", "type": "uint256" }
+          { "internalType": "uint256", "name": "price", "type": "uint256" },
+          {
+            "internalType": "enum IZkFudosan.OfferStatus",
+            "name": "offerStatus",
+            "type": "uint8"
+          }
         ],
         "internalType": "struct IZkFudosan.Offer[]",
         "name": "",

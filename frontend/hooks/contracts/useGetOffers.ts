@@ -6,32 +6,14 @@ import zkFudosanAbi from '../../config/abis/zkFudosan.json';
 
 import { zkFudosanTokenAddress } from '../../config/constants';
 
-export interface CreateListingRequest {
-  secondsUntilEndTime: string;
-  reservePrice: string;
-  detailText: string;
-}
-
-export interface TxRecipt {
-  blockHash: string;
-  blockNumber: number;
-  events: any;
-  logs: any;
-  to: string;
-  transactionHash: string;
-}
-
-const useCreateListing = () => {
+const useGetOffers = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [txRecipt, setTxRecipt] = useState<any>(null);
+  const [offers, setOffers] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const createListing = async (
-    request: CreateListingRequest,
-    signer: ethers.Signer
-  ) => {
+  const getOffers = async (listingId: string, signer: ethers.Signer) => {
     try {
-      setTxRecipt(null);
+      setOffers([]);
       setLoading(true);
 
       const tokenContract = new ethers.Contract(
@@ -40,23 +22,22 @@ const useCreateListing = () => {
         signer
       );
 
-      const tx = await tokenContract.createListing(request);
-      const txRecipt = await tx.wait();
+      const offers = await tokenContract.getOffers(listingId);
 
-      setTxRecipt(txRecipt);
+      setOffers(offers);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching balance:', error);
-      setTxRecipt(null);
+      setOffers([]);
       setLoading(false);
     }
   };
 
   return {
-    createListing,
-    txRecipt,
+    getOffers,
+    offers,
     loading,
   };
 };
 
-export default useCreateListing;
+export default useGetOffers;

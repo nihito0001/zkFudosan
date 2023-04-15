@@ -5,34 +5,41 @@ import {
   Text,
   Grid,
   Modal,
-  Card,
-  Spacer,
-  Loading
+  Loading,
 } from '@nextui-org/react';
-import type { NextPageWithLayout } from '../pages/_app';
+import type { NextPageWithLayout } from './_app';
 import DefaultLayout from '../components/layouts/DefaultLayout';
 import useCreateListing from '../hooks/contracts/useCreateListing';
 import TextInputController from '../components/input/TextInputController';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import type { CreateListingRequest } from '../hooks/contracts/useCreateListing';
+import useMyListings from '../hooks/contracts/useGetMyListings';
 import { useWeb3React } from '@web3-react/core';
-import { etherScanUrl } from '../config/constants'
+import ListingCard from '../components/card/ListingCard';
+import ListingDetailModal from '../components/modal/ListingDetailModal';
+import useCloseListing from '../hooks/contracts/useCloseListing';
+import ResultModal from '../components/modal/ResultModal';
 
 const MyPage: NextPageWithLayout = () => {
+  // Use
   const { active, library } = useWeb3React();
-  // use
   const { createListing, loading, txRecipt } = useCreateListing();
+  const { closeListing, loading: closeListingLoading, txRecipt: closeListingTxRecipt } = useCloseListing()
+  const { getMyListings, listings } = useMyListings();
+
+  // State
+  const [listingId, setListingId] = useState<string>('');
+  const [listingDetailModal, seListingDetailModal] = useState<boolean>(false);
+  const [resultModal, setResultModal] = useState<boolean>(false);
+  const [resultRecipt, setResultRecipt] = useState<any>(null);
+
   // close modal
   const [visible, setVisible] = useState(false);
-  const openHandler = () => setVisible(true);
+
   const closeHandler = () => setVisible(false);
   // create listing modal
   const [listing, setListing] = useState(false);
   const openListingHandler = () => setListing(true);
-  const createListingHandler = (req: any) => console.log(req);
-  const closeListingHandler = () => setListing(false);
-  // Success modal
-  const [successModal, setSuccessModal] = useState<boolean>(false)
 
   const { control, handleSubmit, reset } = useForm<CreateListingRequest>({
     defaultValues: {
@@ -42,51 +49,48 @@ const MyPage: NextPageWithLayout = () => {
     },
   });
 
-  const onSubmit: SubmitHandler<CreateListingRequest> = async (data: CreateListingRequest) => {
-    console.log(data)
-    const tx = await createListing(data, library.getSigner())
-    console.log('tx: ', tx)
+  const onSubmit: SubmitHandler<CreateListingRequest> = async (
+    data: CreateListingRequest
+  ) => {
+    await createListing(data, library.getSigner());
+    getMyListings(library.getSigner());
+  };
+
+  const openListingDetailModal = (id: string) => {
+    setListingId(id);
+    seListingDetailModal(true);
+  };
+
+  const handlerCloseListing = async () => {
+    setResultModal(false)
+    setResultRecipt(null)
+    await closeListing(listingId, library.getSigner());
+    getMyListings(library.getSigner());
+    seListingDetailModal(false)
+    setResultModal(true);
+
+    console.log(closeListingTxRecipt)
+    setResultRecipt(closeListingTxRecipt)
   }
 
   useEffect(() => {
     if (txRecipt) {
-      reset()
-      setListing(false)
-      setSuccessModal(true)
+      reset();
+      setListing(false);
+      setResultModal(true);
     }
-  }, [txRecipt]) 
+  }, [txRecipt]);
 
-  
-  // 外部サイトに遷移
-  const openEtherScan = (tx: string) => {
-    window.open(`${etherScanUrl}/tx/${tx}`, '_blank')
-  }
+  useEffect(() => {
+    if (active) {
+      getMyListings(library.getSigner());
+    }
+  }, [active]);
 
   const formatString = (str: string | null | undefined) => {
     if (str) {
-      return `${str.slice(0, 6)}...${str.slice(
-        str.length - 4,
-        str.length
-      )}`;
+      return `${str.slice(0, 7)}...${str.slice(str.length - 6, str.length)}`;
     }
-  };
-
-  // id情報取得
-  const getId = () => {
-    return 'a';
-  };
-
-  // offer情報取得
-  const getOffer = (id: string) => {
-    console.log('getOffer');
-    const infomation = [
-      { id: 1, from: '0xxx0001', price: '1.2' },
-      { id: 2, from: '0xxx0002', price: '1.0' },
-      { id: 3, from: '0xxx0003', price: '0.8' },
-      { id: 4, from: '0xxx0004', price: '0.2' },
-      { id: 5, from: '0xxx0005', price: '0.1' },
-    ];
-    return infomation;
   };
 
   return (
@@ -94,64 +98,41 @@ const MyPage: NextPageWithLayout = () => {
       <Container>
         <Grid.Container gap={2}>
           <Grid xs={12}>
-            <Button color="gradient" disabled={!active} shadow onPress={openListingHandler}>
+            <Text h1 color="white">
+              My Listing
+            </Text>
+          </Grid>
+          <Grid xs={12}>
+            <Button
+              color="gradient"
+              disabled={!active}
+              shadow
+              onPress={openListingHandler}
+            >
               create Listing
             </Button>
           </Grid>
-
           <Grid xs={12}>
             <Grid.Container gap={2}>
-              <Grid xs={12} justify="center">
-                <Text h1 color="white">
-                  My Listing
-                </Text>
-              </Grid>
-              <Grid xs={12} justify="center">
-                <Text color="white">Reserved Price : 0.5 wETH</Text>
-              </Grid>
-              <Grid xs={12} justify="center">
-                <Text color="white">Duration : 3 days</Text>
-              </Grid>
-              <Grid xs={12} justify="center">
-                <Text color="white">Detail : ここに詳細情報を表示させる</Text>
-              </Grid>
-            </Grid.Container>
-          </Grid>
+              {listings.length === 0 && <p>Not data.</p>}
 
-          <Grid xs={12}>
-            <Grid.Container gap={2}>
-              <Grid xs={12}>
-                <Text h1 color="white">
-                  Offers
-                </Text>
-              </Grid>
-              {getOffer(getId()).map((info) => {
-                return (
-                  <Grid key={info.id} xs={4}>
-                    <Card>
-                      <Card.Body>
-                        <Grid xs={12}>
-                          <Text>{info.from}</Text>
-                        </Grid>
-                        <Spacer y={0.5} />
-                        <Grid xs={12} justify="center">
-                          <Text>{info.price}ETH</Text>
-                        </Grid>
-                        <Grid xs={12} justify="center">
-                          <Button
-                            auto
-                            color="primary"
-                            shadow
-                            onPress={openHandler}
-                          >
-                            Close
-                          </Button>
-                        </Grid>
-                      </Card.Body>
-                    </Card>
-                  </Grid>
-                );
-              })}
+              {listings.length !== 0 &&
+                listings.map((listing: any) => {
+                  return (
+                    <Grid key={listing.listingId.toString()} xs={4}>
+                      <ListingCard
+                        listingId={listing.listingId.toString()}
+                        reservePrice={listing.reservePrice.toString()}
+                        owner={listing.owner}
+                        listingStatus={listing.listingStatus}
+                        buttonLabel="Detail"
+                        handler={() =>
+                          openListingDetailModal(listing.listingId.toString())
+                        }
+                      />
+                    </Grid>
+                  );
+                })}
             </Grid.Container>
           </Grid>
         </Grid.Container>
@@ -188,106 +169,99 @@ const MyPage: NextPageWithLayout = () => {
         open={listing}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-        <Modal.Header>
-          <Text id="moal-title" size={18} b>
-            Create New Listing
-          </Text>
-        </Modal.Header>
+          <Modal.Header>
+            <Text id="moal-title" size={18} b>
+              Create New Listing
+            </Text>
+          </Modal.Header>
 
-        <Modal.Body>
-          <Grid.Container gap={2}>
-            <Grid xs={12}>
-              <TextInputController
-                name="secondsUntilEndTime"
-                label="Deadline"
-                control={control}
-                rules={{
-                  required: 'Please enter deadline',
-                  pattern: {
-                    value: /[0-9]{1,15}/,
-                    message: 'Please the enter number'
-                  }
-                }}
-                disabled={loading}
-                placeholder="Enter the deadline"
-              />
-            </Grid>
-            <Grid xs={12}>
-              <TextInputController
-                name="reservePrice"
-                label="Reserve price (wETH)"
-                control={control}
-                rules={{
-                  required: 'Please enter reserve price',
-                  pattern: {
-                    value: /[0-9]{1,3}/,
-                    message: 'Please enter the number'
-                  }
-                }}
-                disabled={loading}
-                placeholder="Enter reserve price"
-              />
-            </Grid>
-            <Grid xs={12}>
-              <TextInputController
-                name="detailText"
-                label="Detail"
-                control={control}
-                rules={{
-                  required: 'Please enter detail',
-                }}
-                disabled={loading}
-                placeholder="Enter the days of detail"
-              />
-            </Grid>
-          </Grid.Container>
-        </Modal.Body>
-        <Modal.Footer>
-          {loading ? (
-            <Button auto color="secondary" disabled>
-              <Loading type="points" color="currentColor" size="sm" />
-            </Button>
-          ) : (
-            <>
-              <Button flat auto color="error" onPress={() => setListing(false)}>
-                Close
+          <Modal.Body>
+            <Grid.Container gap={2}>
+              <Grid xs={12}>
+                <TextInputController
+                  name="secondsUntilEndTime"
+                  label="Deadline"
+                  control={control}
+                  rules={{
+                    required: 'Please enter deadline',
+                    pattern: {
+                      value: /[0-9]{1,15}/,
+                      message: 'Please the enter number',
+                    },
+                  }}
+                  disabled={loading}
+                  placeholder="Enter the deadline"
+                />
+              </Grid>
+              <Grid xs={12}>
+                <TextInputController
+                  name="reservePrice"
+                  label="Reserve price (wETH)"
+                  control={control}
+                  rules={{
+                    required: 'Please enter reserve price',
+                    pattern: {
+                      value: /[0-9]{1,3}/,
+                      message: 'Please enter the number',
+                    },
+                  }}
+                  disabled={loading}
+                  placeholder="Enter reserve price"
+                />
+              </Grid>
+              <Grid xs={12}>
+                <TextInputController
+                  name="detailText"
+                  label="Detail"
+                  control={control}
+                  rules={{
+                    required: 'Please enter detail',
+                  }}
+                  disabled={loading}
+                  placeholder="Enter the days of detail"
+                />
+              </Grid>
+            </Grid.Container>
+          </Modal.Body>
+          <Modal.Footer>
+            {loading ? (
+              <Button auto color="secondary" disabled>
+                <Loading type="points" color="currentColor" size="sm" />
               </Button>
-              <Button auto color="secondary" shadow type="submit">
-                Create Listing
-              </Button>
-            </>
-          )}
-        </Modal.Footer>
+            ) : (
+              <>
+                <Button
+                  flat
+                  auto
+                  color="error"
+                  onPress={() => setListing(false)}
+                >
+                  Close
+                </Button>
+                <Button auto color="secondary" shadow type="submit">
+                  Create Listing
+                </Button>
+              </>
+            )}
+          </Modal.Footer>
         </form>
       </Modal>
 
-      {/* success modal */}
-      <Modal
-        className="closed"
-        aria-label="Closed"
-        open={successModal}
-        onClose={() => setSuccessModal(false)}
-      >
-        <Modal.Header>
-          <Text id="moal-title" size={18} b>
-            Success!!
-          </Text>
-        </Modal.Header>
-        <Modal.Body>
-          <Grid.Container gap={2}>
-            <Grid xs={12} justify="center">
-              <Text onClick={() => openEtherScan(txRecipt?.transactionHash)}>
-                {`${etherScanUrl}${formatString(txRecipt?.transactionHash)}`}
-              </Text>
-            </Grid>
-          </Grid.Container>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button flat auto color="error" onPress={() => setSuccessModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+      {/* Result modal */}
+      <ResultModal
+        open={resultModal}
+        handlerClose={() => setResultModal(false)}
+        recipt={resultRecipt}
+      />
+
+      {/* Detail modal */}
+      <ListingDetailModal
+        open={listingDetailModal}
+        handlerClose={() => seListingDetailModal(false)}
+        handlerCloseListing={() => handlerCloseListing()}
+        listingId={listingId}
+        loading={closeListingLoading}
+      />
     </>
   );
 };

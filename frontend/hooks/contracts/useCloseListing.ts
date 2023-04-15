@@ -6,12 +6,6 @@ import zkFudosanAbi from '../../config/abis/zkFudosan.json';
 
 import { zkFudosanTokenAddress } from '../../config/constants';
 
-export interface CreateListingRequest {
-  secondsUntilEndTime: string;
-  reservePrice: string;
-  detailText: string;
-}
-
 export interface TxRecipt {
   blockHash: string;
   blockNumber: number;
@@ -21,13 +15,13 @@ export interface TxRecipt {
   transactionHash: string;
 }
 
-const useCreateListing = () => {
+const useCloseListing = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [txRecipt, setTxRecipt] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const createListing = async (
-    request: CreateListingRequest,
+  const closeListing = async (
+    listingId: string,
     signer: ethers.Signer
   ) => {
     try {
@@ -40,7 +34,7 @@ const useCreateListing = () => {
         signer
       );
 
-      const tx = await tokenContract.createListing(request);
+      const tx = await tokenContract.closeListing(listingId);
       const txRecipt = await tx.wait();
 
       setTxRecipt(txRecipt);
@@ -53,10 +47,10 @@ const useCreateListing = () => {
   };
 
   return {
-    createListing,
+    closeListing,
     txRecipt,
     loading,
   };
 };
 
-export default useCreateListing;
+export default useCloseListing;
