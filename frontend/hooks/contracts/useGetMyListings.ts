@@ -38,7 +38,6 @@ const useGetMyListings = () => {
       });
 
       console.log('sortedListings', sortedListings)
-
       setListings(sortedListings);
       setLoading(false);
     } catch (error) {
