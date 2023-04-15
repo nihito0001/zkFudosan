@@ -30,10 +30,10 @@ const useCreateListing = () => {
       );
 
       const tx = await tokenContract.createListing(request);
-      console.log('tx: ', tx)
+      console.log('tx: ', tx);
 
       const txRecipt = await tx.wait();
-      console.log('txRecipt', txRecipt)
+      console.log('txRecipt', txRecipt);
 
       setLoading(false);
       setTxRecipt(txRecipt);

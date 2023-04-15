@@ -9,7 +9,7 @@ export type TextInputProps = {
   control: any;
   rules: any;
   placeholder: any;
-  disabled: boolean
+  disabled: boolean;
 };
 
 const TextInputController = (props: TextInputProps): any => {
