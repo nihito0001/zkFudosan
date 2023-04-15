@@ -1,20 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Badge, Button, Text, Grid, Card, Loading } from '@nextui-org/react';
 import { formatLongLengthString } from '../../libs/formatLongLengthString';
-import { formatWeiToEth } from '../../libs/formatWeiToEth'
+import { formatWeiToEth } from '../../libs/formatWeiToEth';
 import useApproveOffer from '../../hooks/contracts/useApproveOffer';
 import ResultModal from '../../components/modal/ResultModal';
 import { useWeb3React } from '@web3-react/core';
 
 const OfferCard = (props: any) => {
-  const {
-    listingId,
-    offerId,
-    price,
-    offerStatus,
-    offeror,
-    setReloadOfferFlg
-  } = props;
+  const { listingId, offerId, price, offerStatus, offeror, setReloadOfferFlg } =
+    props;
 
   const { library } = useWeb3React();
   const { approveOffer, txReceipt, loading } = useApproveOffer();
@@ -23,15 +17,17 @@ const OfferCard = (props: any) => {
 
   useEffect(() => {
     if (txReceipt) {
-        setReloadOfferFlg(true)
+      setReloadOfferFlg(true);
     }
-  }, [txReceipt])
+  }, [txReceipt]);
 
   return (
     <>
       <Card variant="bordered">
         <Card.Header css={{ pb: 0 }}>
-          <Text>Listing ID: {formatLongLengthString(listingId.toString())}</Text>
+          <Text>
+            Listing ID: {formatLongLengthString(listingId.toString())}
+          </Text>
         </Card.Header>
         <Card.Header css={{ py: 0 }}>
           <Text>Offer ID: {formatLongLengthString(offerId.toString())}</Text>
@@ -61,9 +57,7 @@ const OfferCard = (props: any) => {
             </Badge>
           )}
           <Grid xs={12} justify="center" css={{ pb: 0 }}>
-            <Text>
-              Offer price
-            </Text>
+            <Text>Offer price</Text>
           </Grid>
           <Grid xs={12} justify="center" css={{ pt: 0 }}>
             <Text b h3>
@@ -80,7 +74,12 @@ const OfferCard = (props: any) => {
                     <Loading type="points" color="currentColor" size="sm" />
                   </Button>
                 ) : (
-                  <Button auto color="primary" shadow onClick={() => approveOffer(offerId, library.getSigner())}>
+                  <Button
+                    auto
+                    color="primary"
+                    shadow
+                    onClick={() => approveOffer(offerId, library.getSigner())}
+                  >
                     Approve
                   </Button>
                 )}

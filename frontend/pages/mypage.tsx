@@ -43,6 +43,7 @@ const MyPage: NextPageWithLayout = () => {
 
   // create listing modal
   const [listing, setListing] = useState(false);
+  const [selectedListing, setSelectedListing] = useState<any | null>(null);
   const openListingHandler = () => setListing(true);
 
   const { control, handleSubmit, reset } = useForm<CreateListingRequest>({
@@ -57,12 +58,13 @@ const MyPage: NextPageWithLayout = () => {
     data: CreateListingRequest
   ) => {
     await createListing(data, library.getSigner());
-    setResultRecipt(txRecipt)
+    setResultRecipt(txRecipt);
     getMyListings(library.getSigner());
   };
 
-  const openListingDetailModal = (id: string) => {
-    setListingId(id);
+  const openListingDetailModal = (listing: any) => {
+    setSelectedListing(listing);
+    setListingId(listing.listingId.toString());
     seListingDetailModal(true);
   };
 
@@ -70,8 +72,8 @@ const MyPage: NextPageWithLayout = () => {
     setResultModal(false);
     setResultRecipt(null);
     await closeListing(listingId, library.getSigner());
-    console.log('closeListingTxRecipt: ', closeListingTxRecipt)
-    setResultRecipt(closeListingTxRecipt)
+    console.log('closeListingTxRecipt: ', closeListingTxRecipt);
+    setResultRecipt(closeListingTxRecipt);
     getMyListings(library.getSigner());
     seListingDetailModal(false);
     setResultModal(true);
@@ -139,9 +141,7 @@ const MyPage: NextPageWithLayout = () => {
                         owner={listing.owner}
                         listingStatus={listing.listingStatus}
                         buttonLabel="Detail"
-                        handler={() =>
-                          openListingDetailModal(listing.listingId.toString())
-                        }
+                        handler={() => openListingDetailModal(listing)}
                       />
                     </Grid>
                   );
@@ -284,6 +284,7 @@ By "approve” the offered amount will be sent to the user who has accepted the 
         handlerClose={() => seListingDetailModal(false)}
         handlerCloseListing={() => handlerCloseListing()}
         listingId={listingId}
+        listing={selectedListing}
         loading={closeListingLoading}
       />
     </>
