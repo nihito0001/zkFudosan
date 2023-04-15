@@ -16,10 +16,10 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     address private platformFeeRecipient;
 
     // listingId => Listing
-    mapping(uint256 => Listing) public listings;
+    mapping(uint256 => Listing) private listings;
 
     // listingId => offerId => Offer
-    mapping(uint256 => mapping(uint256 => Offer)) public offers;
+    mapping(uint256 => mapping(uint256 => Offer)) private offers;
 
     // address => listingId[]
     mapping(address => uint256[]) private userListingIds;
@@ -31,7 +31,7 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     mapping(uint256 => uint256[]) private listingOfferIds;
 
     // array of ListingId
-    uint256[] public allListingIds;
+    uint256[] private allListingIds;
 
     constructor(
         address _defaultAdmin,
@@ -93,7 +93,9 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     }
 
     // createListing: リスティングを作成します。
-    function createListing(ListingParameters memory _params) external {
+    function createListing(
+        ListingParameters memory _params
+    ) external nonReentrant {
         // リスティングの作成者がリスティングのオーナーとなります。
         address owner = msg.sender;
 
@@ -131,7 +133,7 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
 
     // offer: リスティングにオファーをします。
     // この際金額をdepositします。
-    function createOffer(uint256 _listingId) external payable {
+    function createOffer(uint256 _listingId) external payable nonReentrant {
         // リスティングを取得します。
         Listing memory listing = listings[_listingId];
 
@@ -171,7 +173,7 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     }
 
     // closeListing: リスティングを成立させます。
-    function closeListing(uint256 _listingId) external {
+    function closeListing(uint256 _listingId) external nonReentrant {
         // リスティングを取得します。
         Listing memory listing = listings[_listingId];
 
@@ -223,7 +225,7 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     }
 
     // cancelListing: リスティングをキャンセルします。
-    function cancelListing(uint256 _listingId) external {
+    function cancelListing(uint256 _listingId) external nonReentrant {
         // リスティングを取得します。
         Listing memory listing = listings[_listingId];
 
@@ -252,10 +254,10 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     }
 
     // approve: リスティングを承認します。
-    function approve(uint256 _offerId) external {}
+    function approve(uint256 _offerId) external nonReentrant {}
 
     // decline: リスティングを拒否します。
-    function decline(uint256 _listingId) external {}
+    function decline(uint256 _listingId) external nonReentrant {}
 
     // getPlatformFeeRecipient: プラットフォームの手数料を受け取るアドレスを取得します。
     function getPlatformFeeRecipient() external view returns (address) {
