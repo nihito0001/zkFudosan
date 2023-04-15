@@ -34,7 +34,7 @@ const setNetworkConfig = (
 };
 
 const config: HardhatUserConfig = {
-  // defaultNetwork: "goerli",
+  defaultNetwork: "goerli",
   networks: Object.keys(chainIds).reduce((acc: any, network: any) => {
     acc[network] = setNetworkConfig(network as keyof typeof chainIds);
     return acc;
