@@ -15,7 +15,6 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import type { CreateListingRequest } from '../hooks/contracts/useCreateListing';
 import useMyListings from '../hooks/contracts/useGetMyListings';
 import { useWeb3React } from '@web3-react/core';
-import { etherScanUrl } from '../config/constants';
 import ListingCard from '../components/card/ListingCard';
 import ListingDetailModal from '../components/modal/ListingDetailModal';
 import useCloseListing from '../hooks/contracts/useCloseListing';
@@ -41,9 +40,6 @@ const MyPage: NextPageWithLayout = () => {
   // create listing modal
   const [listing, setListing] = useState(false);
   const openListingHandler = () => setListing(true);
-
-  // Success modal
-  const [successModal, setSuccessModal] = useState<boolean>(false);
 
   const { control, handleSubmit, reset } = useForm<CreateListingRequest>({
     defaultValues: {
@@ -254,6 +250,8 @@ const MyPage: NextPageWithLayout = () => {
       {/* Result modal */}
       <ResultModal
         open={resultModal}
+        handlerClose={() => setResultModal(false)}
+        recipt={resultRecipt}
       />
 
       {/* Detail modal */}
