@@ -7,6 +7,7 @@ export default function suite() {
     return {
       secondsUntilEndTime: 3600 * 2, // 2 hour
       reservePrice: 1234,
+      detailText: "hoge",
     };
   };
 

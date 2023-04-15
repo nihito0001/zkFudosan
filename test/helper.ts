@@ -12,6 +12,7 @@ export async function deployFixture() {
     accountForListing,
     accountForOffered,
     accountForOffer,
+    accountForCloseListing,
   ] = await ethers.getSigners();
   const contractURI = "https://example.com";
 
@@ -26,21 +27,37 @@ export async function deployFixture() {
   );
 
   const fixtureData = {
+    contractURI,
     owner,
     platformFeeRecipient,
     accountForListing,
     accountForOffered,
     accountForOffer,
-    activeListingId: 0,
-    offeredListingId: 1,
-    contractURI,
+    accountForCloseListing,
   };
 
-  // Create a listing for accountForOffered
+  // Prepare for create offer
   await zkFudosan.connect(fixtureData.accountForOffered).createListing({
     secondsUntilEndTime: 3600 * 2, // 2 hour
     reservePrice: 1234,
+    detailText: "hogehoge",
   });
+
+  // Prepare for close listing
+  await zkFudosan.connect(fixtureData.accountForCloseListing).createListing({
+    secondsUntilEndTime: 3600 * 2, // 2 hour
+    reservePrice: 1234,
+    detailText: "hogehoge",
+  });
+
+  const listings = await zkFudosan
+    .connect(fixtureData.accountForCloseListing)
+    .getMyListings();
+  const listingId = listings[0].listingId;
+
+  await zkFudosan
+    .connect(fixtureData.accountForOffer)
+    .createOffer(listingId, { value: 1234 });
 
   return {
     zkFudosan,

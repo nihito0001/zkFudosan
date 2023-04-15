@@ -10,11 +10,11 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 interface IZkFudosan {
     // Listingのステータスです。
     // - Active: リスティング中
-    // - Cancel: リスティングがキャンセル
+    // - Cancelled: リスティングがキャンセル
     // - Closed: リスティングが成立
     enum ListingStatus {
         Active,
-        Cancel,
+        Cancelled,
         Closed
     }
 
@@ -24,6 +24,7 @@ interface IZkFudosan {
     struct ListingParameters {
         uint256 secondsUntilEndTime;
         uint256 reservePrice;
+        string detailText;
     }
 
     // リスティングの情報です。
@@ -32,14 +33,16 @@ interface IZkFudosan {
     // - endTime: リスティングの終了時間
     // - reservePrice: リスティングの最低価格
     // - listingStatus: リスティングのステータス
+    // - detailText: 詳細分
+    // - closer: 落札者
     struct Listing {
         uint256 listingId;
         address owner;
         uint256 endTime;
         uint256 reservePrice;
         ListingStatus listingStatus;
-        // TODO
-        // URLを追加
+        string detailText;
+        address closer;
     }
 
     // オファーの情報です。
@@ -56,6 +59,13 @@ interface IZkFudosan {
         address indexed lister,
         Listing listing
     );
+
+    // リスティングが成立したときに発火します。
+    event ListingClosed(uint256 indexed listingId, Listing listing);
+
+    // リスティングがキャンセルしたときに発火します。
+    // - この際depositした金額を返金します。
+    event ListingCancelled(uint256 indexed listingId, Listing listing);
 
     // リスティングにオファーがされたときに発火します。
     event OfferAdded(
@@ -84,7 +94,8 @@ interface IZkFudosan {
     function createOffer(uint256 _listingId) external payable;
 
     // closeListing: リスティングした人がリスティングを成立させます。
-    function closeListing(uint256 _listingId, uint256 _offerId) external;
+    // - 一番高いオファー価格のオファーを成立させる
+    function closeListing(uint256 _listingId) external;
 
     // cancelListing: リスティングした人がリスティングをキャンセルします。
     // - listingOwnerのみキャンセルできるようにする
