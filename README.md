@@ -37,6 +37,11 @@ Deploy to taiko
 npx hardhat run scripts/deploy.ts --network taiko
 ```
 
+```bash
+Deploy to scroll
+npx hardhat run scripts/deploy.ts --network scroll
+```
+
 ## 🌟 Contributing
 
 ## 📡 License

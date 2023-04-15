@@ -15,7 +15,7 @@ const chainIds = {
   mainnet: 1,
   goerli: 5,
   sepolia: 0,
-  scroll: 0,
+  scroll: 534353,
   taiko: 167002,
 };
 
@@ -24,7 +24,7 @@ const setNetworkConfig = (
 ): NetworkUserConfig => {
   let url = "";
   if (network === "scroll") {
-    url = ``;
+    url = "https://alpha-rpc.scroll.io/l2";
   } else if (network === "taiko") {
     url = "https://l2rpc.hackathon.taiko.xyz";
   } else {
