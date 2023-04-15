@@ -114,7 +114,10 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
             owner,
             endTime,
             _params.reservePrice,
-            listingStatus
+            listingStatus,
+            _params.detailText,
+            // 初期の落札者はownerにしています。
+            owner
         );
 
         // リスティングを保存します。
@@ -168,10 +171,85 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     }
 
     // closeListing: リスティングを成立させます。
-    function closeListing(uint256 _listingId, uint256 _offerId) external {}
+    function closeListing(uint256 _listingId) external {
+        // リスティングを取得します。
+        Listing memory listing = listings[_listingId];
+
+        // リスティングが存在するか確認します。
+        require(listing.listingId != 0, "Listing does not exist");
+
+        // リスティングのステータスがActiveか確認します。
+        require(
+            listing.listingStatus == ListingStatus.Active,
+            "Listing is not active"
+        );
+
+        // リスティングの終了時間が現在時刻よりも後か確認します。
+        require(block.timestamp < listing.endTime, "Listing is already closed");
+
+        // 一番高いオファーを取得します。
+        Offer memory highestOffer = getHighestPriceOffer(_listingId);
+
+        // オファーが存在するか確認します。
+        require(highestOffer.offerId != 0, "Offer does not exist");
+
+        // リスティングのステータスをClosedにします。
+        listing.listingStatus = ListingStatus.Closed;
+        listing.closer = highestOffer.offeror;
+
+        // リスティングを保存します。
+        listings[_listingId] = listing;
+
+        // リスティングが成立したことを通知します。
+        emit ListingClosed(_listingId, listing);
+    }
+
+    // getHighestPriceOffer: 一番priceの高いオファーを取得する
+    function getHighestPriceOffer(
+        uint256 _listingId
+    ) internal view returns (Offer memory) {
+        uint256[] memory offerIds = listingOfferIds[_listingId];
+
+        Offer memory highestPriceOffer;
+        uint256 memoPrice = 0;
+        for (uint256 i = 0; i < offerIds.length; i++) {
+            Offer memory offer = offers[_listingId][offerIds[i]];
+
+            if (offer.price > memoPrice) {
+                highestPriceOffer = offer;
+            }
+        }
+        return highestPriceOffer;
+    }
 
     // cancelListing: リスティングをキャンセルします。
-    function cancelListing(uint256 _listingId) external {}
+    function cancelListing(uint256 _listingId) external {
+        // リスティングを取得します。
+        Listing memory listing = listings[_listingId];
+
+        // リスティングが存在するか確認します。
+        require(listing.listingId != 0, "Listing does not exist");
+
+        // リスティングのステータスがActiveか確認します。
+        require(
+            listing.listingStatus == ListingStatus.Active,
+            "Listing is not active"
+        );
+
+        // リスティングの終了時間が現在時刻よりも後か確認します。
+        require(block.timestamp < listing.endTime, "Listing is already closed");
+
+        // リスティングのステータスをCancelledにします。
+        listing.listingStatus = ListingStatus.Cancelled;
+
+        // リスティングを保存します。
+        listings[_listingId] = listing;
+
+        // リスティングがキャンセルされたことを通知します。
+        emit ListingCancelled(_listingId, listing);
+
+        // TODO depositoを返金する
+    }
 
     // approve: リスティングを承認します。
     function approve(uint256 _offerId) external {}
