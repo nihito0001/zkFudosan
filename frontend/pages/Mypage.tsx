@@ -90,12 +90,6 @@ const MyPage: NextPageWithLayout = () => {
     }
   }, [active]);
 
-  const formatString = (str: string | null | undefined) => {
-    if (str) {
-      return `${str.slice(0, 7)}...${str.slice(str.length - 6, str.length)}`;
-    }
-  };
-
   return (
     <>
       <Container>
