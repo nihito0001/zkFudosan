@@ -6,14 +6,14 @@ import zkFudosanAbi from '../../config/abis/zkFudosan.json';
 
 import { zkFudosanTokenAddress } from '../../config/constants';
 
-const useGetMyListings = () => {
+const useGetOffers = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [listings, setListings] = useState<any>([]);
+  const [offers, setOffers] = useState<any>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const getMyListings = async (signer: ethers.Signer) => {
+  const getOffers = async (listingId: string, signer: ethers.Signer) => {
     try {
-      setListings([]);
+      setOffers([]);
       setLoading(true);
 
       const tokenContract = new ethers.Contract(
@@ -22,23 +22,22 @@ const useGetMyListings = () => {
         signer
       );
 
-      const listings = await tokenContract.getMyListings.call();
-      console.log(listings);
+      const offers = await tokenContract.getOffers(listingId);
 
-      setListings(listings);
+      setOffers(offers);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching balance:', error);
-      setListings([]);
+      setOffers([]);
       setLoading(false);
     }
   };
 
   return {
-    getMyListings,
-    listings,
+    getOffers,
+    offers,
     loading,
   };
 };
 
-export default useGetMyListings;
+export default useGetOffers;

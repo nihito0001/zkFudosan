@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app';
 import type { NextPage } from 'next';
 import { NextUIProvider, createTheme } from '@nextui-org/react';
 import { Web3ReactProvider } from '@web3-react/core';
-import { SSRProvider } from '@react-aria/ssr';
+// import { SSRProvider } from '@react-aria/ssr';
 import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
 import type { ReactElement, ReactNode } from 'react';
 
@@ -34,7 +34,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <Web3ReactProvider getLibrary={getLibrary}>
         <NextUIProvider theme={theme}>
-          <SSRProvider>{setLayout(<Component {...pageProps} />)}</SSRProvider>
+          {setLayout(<Component {...pageProps} />)}
         </NextUIProvider>
       </Web3ReactProvider>
     </>

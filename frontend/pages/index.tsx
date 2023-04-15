@@ -1,12 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  Button,
-  Text,
-  Container,
-  Grid,
-  Modal,
-  Input,
-} from '@nextui-org/react';
+import { Button, Text, Container, Grid, Modal, Input } from '@nextui-org/react';
 import type { NextPageWithLayout } from '../pages/_app';
 import DefaultLayout from '../components/layouts/DefaultLayout';
 import ListingCard from '../components/card/ListingCard';
@@ -21,9 +14,9 @@ const HomePage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (active) {
-      getAllActiveListings(library.getSigner())
+      getAllActiveListings(library.getSigner());
     }
-  }, [active])
+  }, [active]);
 
   return (
     <>
@@ -38,21 +31,22 @@ const HomePage: NextPageWithLayout = () => {
             <Grid.Container gap={2}>
               {activeListings.length === 0 && <p>Not data.</p>}
 
-              {activeListings.length !== 0 && activeListings.map((listing: any) => {
-                return (
-                  <Grid key={listing.listingId.toString()} xs={4}>
-                    <ListingCard
-                      listingId={listing.listingId.toString()}
-                      reservePrice={listing.reservePrice.toString()}
-                      owner={listing.owner}
-                      detail={listing.detailText}
-                      listingStatus={listing.listingStatus}
-                      buttonLabel="Offer"
-                      handler={() => setOfferListingModal(true)}
-                    />
-                  </Grid>
-                );
-              })}
+              {activeListings.length !== 0 &&
+                activeListings.map((listing: any) => {
+                  return (
+                    <Grid key={listing.listingId.toString()} xs={4}>
+                      <ListingCard
+                        listingId={listing.listingId.toString()}
+                        reservePrice={listing.reservePrice.toString()}
+                        owner={listing.owner}
+                        detail={listing.detailText}
+                        listingStatus={listing.listingStatus}
+                        buttonLabel="Offer"
+                        handler={() => setOfferListingModal(true)}
+                      />
+                    </Grid>
+                  );
+                })}
             </Grid.Container>
           </Grid>
         </Grid.Container>
@@ -87,10 +81,21 @@ const HomePage: NextPageWithLayout = () => {
           />
         </Modal.Body>
         <Modal.Footer>
-          <Button auto color="error" shadow onClick={() => setOfferListingModal(false)}>
+          <Button
+            auto
+            color="error"
+            shadow
+            onClick={() => setOfferListingModal(false)}
+          >
             Close
           </Button>
-          <Button auto shadow onClick={() => {console.log('test')}}>
+          <Button
+            auto
+            shadow
+            onClick={() => {
+              console.log('test');
+            }}
+          >
             Offer
           </Button>
         </Modal.Footer>

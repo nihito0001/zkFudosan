@@ -13,7 +13,7 @@ const useGetAllActiveListings = () => {
 
   const getAllActiveListings = async (signer: ethers.Signer) => {
     try {
-      setActiveListings([])
+      setActiveListings([]);
       setLoading(true);
 
       const tokenContract = new ethers.Contract(
@@ -22,8 +22,8 @@ const useGetAllActiveListings = () => {
         signer
       );
 
-      const activeListings = await tokenContract.getAllActiveListings.call()
-      console.log('activeListings', activeListings)
+      const activeListings = await tokenContract.getAllActiveListings.call();
+
       setActiveListings(activeListings);
       setLoading(false);
     } catch (error) {

@@ -13,12 +13,12 @@ export interface CreateListingRequest {
 }
 
 export interface TxRecipt {
-  blockHash: string
-  blockNumber: number
-  events: any
-  logs: any
-  to: string
-  transactionHash: string
+  blockHash: string;
+  blockNumber: number;
+  events: any;
+  logs: any;
+  to: string;
+  transactionHash: string;
 }
 
 const useCreateListing = () => {
@@ -31,7 +31,7 @@ const useCreateListing = () => {
     signer: ethers.Signer
   ) => {
     try {
-      setTxRecipt(null)
+      setTxRecipt(null);
       setLoading(true);
 
       const tokenContract = new ethers.Contract(
