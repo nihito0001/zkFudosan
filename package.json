@@ -1,7 +1,6 @@
 {
   "name": "zk-fudosan",
   "private": true,
-  "workspaces": ["frontend"],
   "scripts": {
     "start": "yarn workspace frontend dev",
     "test": "hardhat test",
@@ -12,6 +11,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",
+    "dotenv": "^16.0.3",
     "operator-filter-registry": "^1.4.1"
   },
   "devDependencies": {
