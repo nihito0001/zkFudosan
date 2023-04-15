@@ -15,13 +15,16 @@ import useCreateListing from '../hooks/contracts/useCreateListing';
 import TextInputController from '../components/input/TextInputController';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import type { CreateListingRequest } from '../hooks/contracts/useCreateListing';
+import useMyListings from '../hooks/contracts/useGetMyListings';
 import { useWeb3React } from '@web3-react/core';
 import { etherScanUrl } from '../config/constants'
+import ListingCard from '../components/card/ListingCard';
 
 const MyPage: NextPageWithLayout = () => {
   const { active, library } = useWeb3React();
   // use
   const { createListing, loading, txRecipt } = useCreateListing();
+  const { getMyListings, listings } = useMyListings();
   // close modal
   const [visible, setVisible] = useState(false);
   const openHandler = () => setVisible(true);
@@ -43,7 +46,6 @@ const MyPage: NextPageWithLayout = () => {
   });
 
   const onSubmit: SubmitHandler<CreateListingRequest> = async (data: CreateListingRequest) => {
-    console.log(data)
     const tx = await createListing(data, library.getSigner())
     console.log('tx: ', tx)
   }
@@ -54,7 +56,13 @@ const MyPage: NextPageWithLayout = () => {
       setListing(false)
       setSuccessModal(true)
     }
-  }, [txRecipt]) 
+  }, [txRecipt])
+
+  useEffect(() => {
+    if (active) {
+      getMyListings(library.getSigner())
+    }
+  }, [active])
 
   
   // 外部サイトに遷移
@@ -64,8 +72,8 @@ const MyPage: NextPageWithLayout = () => {
 
   const formatString = (str: string | null | undefined) => {
     if (str) {
-      return `${str.slice(0, 6)}...${str.slice(
-        str.length - 4,
+      return `${str.slice(0, 7)}...${str.slice(
+        str.length - 6,
         str.length
       )}`;
     }
@@ -94,14 +102,39 @@ const MyPage: NextPageWithLayout = () => {
       <Container>
         <Grid.Container gap={2}>
           <Grid xs={12}>
+            <Text h1 color="white">
+              My Listing
+            </Text>
+          </Grid>
+          <Grid xs={12}>
             <Button color="gradient" disabled={!active} shadow onPress={openListingHandler}>
               create Listing
             </Button>
           </Grid>
+          <Grid xs={12}>
+            <Grid.Container gap={2}>
+              {listings.length === 0 && <p>Not data.</p>}
+
+              {listings.length !== 0 && listings.map((listing: any) => {
+                return (
+                  <Grid key={listing.listingId.toString()} xs={4}>
+                    <ListingCard
+                      listingId={listing.listingId.toString()}
+                      reservePrice={listing.reservePrice.toString()}
+                      owner={listing.owner}
+                      listingStatus={listing.listingStatus}
+                      buttonLabel="Detail"
+                      handler={() => console.log('test')}
+                    />
+                  </Grid>
+                );
+              })}
+            </Grid.Container>
+          </Grid>
 
           <Grid xs={12}>
             <Grid.Container gap={2}>
-              <Grid xs={12} justify="center">
+              <Grid xs={12}>
                 <Text h1 color="white">
                   My Listing
                 </Text>
