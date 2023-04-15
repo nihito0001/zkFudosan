@@ -1,15 +1,28 @@
 import { useEffect } from 'react';
 import { useWeb3React } from '@web3-react/core';
+import useChat from '../../hooks/useChat';
 import { Button, Card, Grid, Modal, Text, Loading } from '@nextui-org/react';
 import useGetOffers from '../../hooks/contracts/useGetOffers';
 import { formatLongLengthString } from '../../libs/formatLongLengthString';
-import { ethers } from 'ethers'
+import { ethers } from 'ethers';
 
 const ListingDetailModal = (props: any) => {
-  const { open, handlerClose, handlerCloseListing, listingId, loading } = props;
+  const {
+    open,
+    handlerClose,
+    handlerCloseListing,
+    listingId,
+    listing,
+    loading,
+  } = props;
 
   const { active, library } = useWeb3React();
   const { offers, getOffers } = useGetOffers();
+  const { sendMessage } = useChat();
+
+  const handleSendMessage = (listing: any) => {
+    sendMessage(listing.owner.address, 'Congratuations!! you got!');
+  };
 
   useEffect(() => {
     if (active && library && listingId) {
@@ -40,9 +53,26 @@ const ListingDetailModal = (props: any) => {
                   <Loading type="points" color="currentColor" size="sm" />
                 </Button>
               ) : (
-                <Button color="error" disabled={loading} onClick={() => handlerCloseListing()}>
-                  Close with highest offer
-                </Button> 
+                <>
+                  {listing && listing.listingStatus === 0 && (
+                    <Button
+                      color="error"
+                      disabled={loading}
+                      onClick={() => handlerCloseListing()}
+                    >
+                      Close with highest offer
+                    </Button>
+                  )}
+                  {listing && listing.listingStatus === 2 && (
+                    <Button
+                      color="success"
+                      disabled={loading}
+                      onClick={() => handleSendMessage(listing)}
+                    >
+                      Contact
+                    </Button>
+                  )}
+                </>
               )}
             </Grid>
             {offers.length === 0 && <Text>No offers</Text>}
@@ -51,9 +81,13 @@ const ListingDetailModal = (props: any) => {
                 <>
                   <Card key={index} variant="bordered" css={{ mb: 16 }}>
                     <Card.Header>
-                      OfferID: {formatLongLengthString(offer.offerId.toString())}<br />
-                      Owner: {formatLongLengthString(offer.offeror)}<br />
-                      Price: {ethers.utils.formatUnits(offer.price.toString(), 18)} ETH
+                      OfferID:{' '}
+                      {formatLongLengthString(offer.offerId.toString())}
+                      <br />
+                      Owner: {formatLongLengthString(offer.offeror)}
+                      <br />
+                      Price:{' '}
+                      {ethers.utils.formatUnits(offer.price.toString(), 18)} ETH
                     </Card.Header>
                   </Card>
                 </>
@@ -66,7 +100,13 @@ const ListingDetailModal = (props: any) => {
               <Loading type="points" color="currentColor" size="sm" />
             </Button>
           ) : (
-            <Button flat auto color="error" disabled={loading} onPress={() => handlerClose()}>
+            <Button
+              flat
+              auto
+              color="error"
+              disabled={loading}
+              onPress={() => handlerClose()}
+            >
               Close
             </Button>
           )}
