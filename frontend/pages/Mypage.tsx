@@ -39,10 +39,6 @@ const MyPage: NextPageWithLayout = () => {
   const [resultModal, setResultModal] = useState<boolean>(false);
   const [resultRecipt, setResultRecipt] = useState<any>(null);
 
-  // close modal
-  const [visible, setVisible] = useState(false);
-
-  const closeHandler = () => setVisible(false);
   // create listing modal
   const [listing, setListing] = useState(false);
   const openListingHandler = () => setListing(true);
@@ -59,6 +55,7 @@ const MyPage: NextPageWithLayout = () => {
     data: CreateListingRequest
   ) => {
     await createListing(data, library.getSigner());
+    setResultRecipt(txRecipt)
     getMyListings(library.getSigner());
   };
 
@@ -71,12 +68,11 @@ const MyPage: NextPageWithLayout = () => {
     setResultModal(false);
     setResultRecipt(null);
     await closeListing(listingId, library.getSigner());
+    console.log('closeListingTxRecipt: ', closeListingTxRecipt)
+    setResultRecipt(closeListingTxRecipt)
     getMyListings(library.getSigner());
     seListingDetailModal(false);
     setResultModal(true);
-
-    console.log(closeListingTxRecipt);
-    setResultRecipt(closeListingTxRecipt);
   };
 
   useEffect(() => {
@@ -93,12 +89,6 @@ const MyPage: NextPageWithLayout = () => {
       getMyOffers(library.getSigner());
     }
   }, [active]);
-
-  const formatString = (str: string | null | undefined) => {
-    if (str) {
-      return `${str.slice(0, 7)}...${str.slice(str.length - 6, str.length)}`;
-    }
-  };
 
   return (
     <>
@@ -127,7 +117,7 @@ const MyPage: NextPageWithLayout = () => {
               {listings.length !== 0 &&
                 listings.map((listing: any) => {
                   return (
-                    <Grid key={listing.listingId.toString()} xs={4}>
+                    <Grid key={listing.listingId.toString()} xs={12} md={4}>
                       <ListingCard
                         listingId={listing.listingId.toString()}
                         reservePrice={listing.reservePrice.toString()}
@@ -176,30 +166,6 @@ const MyPage: NextPageWithLayout = () => {
           </Grid>
         </Grid.Container>
       </Container>
-
-      {/* close modal */}
-      <Modal
-        closeButton
-        className="closed"
-        aria-label="Closed"
-        open={visible}
-        onClose={closeHandler}
-      >
-        <Modal.Header>
-          <Text id="moal-title" size={18} b>
-            Closed
-          </Text>
-        </Modal.Header>
-
-        <Modal.Body>
-          <Grid.Container gap={2} css={{ margin: '5' }}>
-            <Grid xs={12} justify="center">
-              <Text>successfully closed</Text>
-            </Grid>
-          </Grid.Container>
-        </Modal.Body>
-        <Modal.Footer></Modal.Footer>
-      </Modal>
 
       {/* create new listing modal */}
       <Modal
