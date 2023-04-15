@@ -12,6 +12,7 @@ import useCreateOffer, {
 import { useForm, SubmitHandler } from 'react-hook-form';
 import ResultModal from '../components/modal/ResultModal';
 import TextInputController from '../components/input/TextInputController';
+import { formatWeiToEth } from '../libs/formatWeiToEth';
 
 type Listing = {
   id: number;
@@ -25,8 +26,14 @@ type Listing = {
 
 const dateFormat = (_listing: Listing): string => {
   const d = new Date(Number(_listing.endTime) * 1000);
-  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}`;
+  return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`;
 };
+
+const checkDeadline = (endtime: string): boolean => {
+  const now = new Date();
+  const end = new Date(Number(endtime) * 1000);
+  return now.getTime() < end.getTime();
+}
 
 const HomePage: NextPageWithLayout = () => {
   // Use
@@ -134,7 +141,7 @@ const HomePage: NextPageWithLayout = () => {
                 <>
                   <Text>
                     Sale Price :<br />
-                    {selectedListing.reservePrice.toString()} ETH
+                    {formatWeiToEth(selectedListing.reservePrice.toString())} ETH
                   </Text>
                   <Text>
                     Duration :<br />
@@ -179,17 +186,30 @@ const HomePage: NextPageWithLayout = () => {
                 </>
               ) : (
                 <>
-                  <Button
-                    auto
-                    color="error"
-                    shadow
-                    onClick={() => setOfferListingModal(false)}
-                  >
-                    Close
-                  </Button>
-                  <Button auto color="secondary" shadow type="submit">
-                    Offer
-                  </Button>
+                  {checkDeadline(selectedListing?.endTime || '') ? (
+                    <>
+                      <Button
+                        auto
+                        color="error"
+                        shadow
+                        onClick={() => setOfferListingModal(false)}
+                      >
+                        Close
+                      </Button>
+                        <Button auto color="secondary" shadow type="submit">
+                        Offer
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      auto
+                      color="error"
+                      shadow
+                      onClick={() => setOfferListingModal(false)}
+                    >
+                      This listing has expired
+                    </Button>
+                  )}
                 </>
               )}
             </Modal.Footer>

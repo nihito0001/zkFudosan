@@ -39,6 +39,7 @@ const MyPage: NextPageWithLayout = () => {
   const [listingDetailModal, seListingDetailModal] = useState<boolean>(false);
   const [resultModal, setResultModal] = useState<boolean>(false);
   const [resultRecipt, setResultRecipt] = useState<any>(null);
+  const [reloadOffersFlg, setReloadOfferFlg] = useState(false);
 
   // create listing modal
   const [listing, setListing] = useState(false);
@@ -90,6 +91,13 @@ const MyPage: NextPageWithLayout = () => {
       getMyOffers(library.getSigner());
     }
   }, [active]);
+
+  useEffect(() => {
+    if (reloadOffersFlg) {
+      setReloadOfferFlg(false)
+      getMyOffers(library.getSigner());
+    }
+  }, [reloadOffersFlg])
 
   return (
     <>
@@ -156,7 +164,7 @@ const MyPage: NextPageWithLayout = () => {
                         price={offer.price.toString()}
                         offeror={offer.offeror}
                         offerStatus={offer.offerStatus}
-                        buttonLabel="Detail"
+                        setReloadOfferFlg={setReloadOfferFlg}
                       />
                     </Grid>
                   );
