@@ -4,11 +4,11 @@ import { connector } from '../../config/connectors';
 import { useWeb3React } from '@web3-react/core';
 
 export const Nav = () => {
-  const { account, activate } = useWeb3React();
+  const { account, active, activate } = useWeb3React();
 
   useEffect(() => {
-    console.log(account)
-  }, [account])
+    console.log(account);
+  }, [account]);
 
   return (
     <>
@@ -24,7 +24,12 @@ export const Nav = () => {
 
         <Navbar.Content>
           <Navbar.Item>
-            <Button auto color="gradient" shadow onClick={() => activate(connector.injected)}>
+            <Button
+              auto
+              color="gradient"
+              shadow
+              onClick={() => activate(connector.injected)}
+            >
               connect wallet
             </Button>
           </Navbar.Item>

@@ -1,16 +1,17 @@
-import React, { FC, ReactNode } from 'react'
+import React, { FC, ReactNode } from 'react';
+import { Nav } from '../navbar/Nav';
 
 type DefaultLayoutProps = {
-  children: ReactNode
-}
-
+  children: ReactNode;
+};
 
 const DefaultLayout: FC<DefaultLayoutProps> = ({ children }) => {
   return (
     <div>
+      <Nav />
       <div>{children}</div>
     </div>
-  )
-}
+  );
+};
 
-export default DefaultLayout
+export default DefaultLayout;

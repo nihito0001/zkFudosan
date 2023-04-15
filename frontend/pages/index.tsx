@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, Text, Card, Container, Grid, Spacer } from '@nextui-org/react';
-import { Nav } from '../components/navbar/Nav';
-import type { NextPageWithLayout } from '../pages/_app'
-import DefaultLayout from '../components/layouts/DefaultLayout'
+import type { NextPageWithLayout } from '../pages/_app';
+import DefaultLayout from '../components/layouts/DefaultLayout';
 
 const HomePage: NextPageWithLayout = () => {
   const infomation = [
@@ -16,8 +15,6 @@ const HomePage: NextPageWithLayout = () => {
 
   return (
     <>
-      <Nav />
-
       <Container>
         <Grid.Container gap={2}>
           <Grid xs={12} justify="center">
@@ -51,10 +48,10 @@ const HomePage: NextPageWithLayout = () => {
       </Container>
     </>
   );
-}
+};
 
 HomePage.getLayout = function getLayout(page) {
-  return <DefaultLayout>{page}</DefaultLayout>
-}
+  return <DefaultLayout>{page}</DefaultLayout>;
+};
 
-export default HomePage
+export default HomePage;
