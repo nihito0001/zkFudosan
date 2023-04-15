@@ -1,12 +1,13 @@
 import { Badge, Button, Text, Grid, Card } from '@nextui-org/react';
 import { formatLongLengthString } from '../../libs/formatLongLengthString';
 
-const ListingCard = (props: any) => {
+const OfferCard = (props: any) => {
   const {
     listingId,
+    offerId,
     reservePrice,
-    listingStatus,
-    owner,
+    offerStatus,
+    offeror,
     buttonLabel,
     handler,
   } = props;
@@ -16,23 +17,36 @@ const ListingCard = (props: any) => {
       <Card.Header css={{ pb: 0 }}>
         <Text>Listing ID: {formatLongLengthString(listingId.toString())}</Text>
       </Card.Header>
+      <Card.Header css={{ py: 0 }}>
+        <Text>Offer ID: {formatLongLengthString(offerId.toString())}</Text>
+      </Card.Header>
       <Card.Header css={{ pt: 0 }}>
-        <Text>Owner: {formatLongLengthString(owner)}</Text>
+        <Text>Offeror: {formatLongLengthString(offeror)}</Text>
       </Card.Header>
       <Card.Body css={{ pt: 0 }}>
-        {listingStatus === 0 && (
+        {offerStatus === 0 && (
           <Badge color="primary" variant="bordered">
             Active
           </Badge>
         )}
-        {listingStatus === 1 && (
+        {offerStatus === 1 && (
           <Badge color="warning" variant="bordered">
-            Cancelled
+            Declined
           </Badge>
         )}
-        {listingStatus === 2 && (
+        {offerStatus === 2 && (
+          <Badge color="primary" variant="bordered">
+            Approved
+          </Badge>
+        )}
+        {offerStatus === 3 && (
+          <Badge color="primary" variant="bordered">
+            Approved
+          </Badge>
+        )}
+        {offerStatus === 3 && (
           <Badge color="error" variant="bordered">
-            Closed
+            Refunded
           </Badge>
         )}
         <Grid xs={12} justify="center">
@@ -54,4 +68,4 @@ const ListingCard = (props: any) => {
   );
 };
 
-export default ListingCard;
+export default OfferCard;

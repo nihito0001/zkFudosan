@@ -24,7 +24,22 @@ const useGetMyOffers = () => {
 
       const offers = await tokenContract.getMyOffers.call();
 
-      setOffers(offers);
+      // listingsにidを追加
+      const listingsWithId = offers.map((offer: any, index: number) => {
+        return {
+          ...offer,
+          id: index,
+        };
+      });
+
+      // listingsWithIdのIDを元にソート
+      const sortedListings = listingsWithId.sort((a: any, b: any) => {
+        return b.id - a.id;
+      });
+
+      console.log(sortedListings)
+
+      setOffers(sortedListings);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching balance:', error);
