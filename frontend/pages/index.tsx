@@ -90,10 +90,16 @@ const HomePage: NextPageWithLayout = () => {
     <>
       <Container>
         <Grid.Container gap={2}>
-          <Grid xs={12}>
+          <Grid xs={12} css={{ paddingBottom: "0", marginBottom: "inherit" }}>
             <Text h1 color="white">
               Listings
             </Text>
+          </Grid>
+          <Grid xs={12} css={{ paddingTop: "0" }} >
+            <Text color='white'>
+            All the information of the listed mediation contracts.<br/>
+Everyone can view it and make offers by specifying the offered amount for the listing they want to mediate.
+              </Text>
           </Grid>
           <Grid xs={12}>
             <Grid.Container gap={2}>
