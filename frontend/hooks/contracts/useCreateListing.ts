@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import { ethers } from 'ethers';
 
@@ -11,6 +12,15 @@ export interface CreateListingRequest {
   detailText: string;
 }
 
+export interface TxRecipt {
+  blockHash: string
+  blockNumber: number
+  events: any
+  logs: any
+  to: string
+  transactionHash: string
+}
+
 const useCreateListing = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [txRecipt, setTxRecipt] = useState<any>(null);
@@ -21,6 +31,7 @@ const useCreateListing = () => {
     signer: ethers.Signer
   ) => {
     try {
+      setTxRecipt(null)
       setLoading(true);
 
       const tokenContract = new ethers.Contract(
@@ -30,13 +41,10 @@ const useCreateListing = () => {
       );
 
       const tx = await tokenContract.createListing(request);
-      console.log('tx: ', tx);
-
       const txRecipt = await tx.wait();
-      console.log('txRecipt', txRecipt);
 
-      setLoading(false);
       setTxRecipt(txRecipt);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching balance:', error);
       setTxRecipt(null);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Button,
   Container,
@@ -16,22 +16,25 @@ import TextInputController from '../components/input/TextInputController';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import type { CreateListingRequest } from '../hooks/contracts/useCreateListing';
 import { useWeb3React } from '@web3-react/core';
+import { etherScanUrl } from '../config/constants'
 
 const MyPage: NextPageWithLayout = () => {
   const { active, library } = useWeb3React();
   // use
-  const { createListing, loading } = useCreateListing();
+  const { createListing, loading, txRecipt } = useCreateListing();
   // close modal
-  const [visible, setVisible] = React.useState(false);
+  const [visible, setVisible] = useState(false);
   const openHandler = () => setVisible(true);
   const closeHandler = () => setVisible(false);
   // create listing modal
-  const [listing, setListing] = React.useState(false);
+  const [listing, setListing] = useState(false);
   const openListingHandler = () => setListing(true);
   const createListingHandler = (req: any) => console.log(req);
   const closeListingHandler = () => setListing(false);
+  // Success modal
+  const [successModal, setSuccessModal] = useState<boolean>(false)
 
-  const { control, handleSubmit } = useForm<CreateListingRequest>({
+  const { control, handleSubmit, reset } = useForm<CreateListingRequest>({
     defaultValues: {
       secondsUntilEndTime: '',
       reservePrice: '',
@@ -44,6 +47,29 @@ const MyPage: NextPageWithLayout = () => {
     const tx = await createListing(data, library.getSigner())
     console.log('tx: ', tx)
   }
+
+  useEffect(() => {
+    if (txRecipt) {
+      reset()
+      setListing(false)
+      setSuccessModal(true)
+    }
+  }, [txRecipt]) 
+
+  
+  // 外部サイトに遷移
+  const openEtherScan = (tx: string) => {
+    window.open(`${etherScanUrl}/tx/${tx}`, '_blank')
+  }
+
+  const formatString = (str: string | null | undefined) => {
+    if (str) {
+      return `${str.slice(0, 6)}...${str.slice(
+        str.length - 4,
+        str.length
+      )}`;
+    }
+  };
 
   // id情報取得
   const getId = () => {
@@ -157,11 +183,9 @@ const MyPage: NextPageWithLayout = () => {
 
       {/* create new listing modal */}
       <Modal
-        closeButton
         className="create-new-listing"
         aria-label="Create New Listing"
         open={listing}
-        onClose={closeListingHandler}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
         <Modal.Header>
@@ -220,16 +244,49 @@ const MyPage: NextPageWithLayout = () => {
         </Modal.Body>
         <Modal.Footer>
           {loading ? (
-            <Button auto color="secondary" shadow type="submit">
+            <Button auto color="secondary" disabled>
               <Loading type="points" color="currentColor" size="sm" />
             </Button>
           ) : (
-            <Button auto color="secondary" shadow type="submit">
-              Create Listing
-            </Button>
+            <>
+              <Button flat auto color="error" onPress={() => setListing(false)}>
+                Close
+              </Button>
+              <Button auto color="secondary" shadow type="submit">
+                Create Listing
+              </Button>
+            </>
           )}
         </Modal.Footer>
         </form>
+      </Modal>
+
+      {/* success modal */}
+      <Modal
+        className="closed"
+        aria-label="Closed"
+        open={successModal}
+        onClose={() => setSuccessModal(false)}
+      >
+        <Modal.Header>
+          <Text id="moal-title" size={18} b>
+            Success!!
+          </Text>
+        </Modal.Header>
+        <Modal.Body>
+          <Grid.Container gap={2}>
+            <Grid xs={12} justify="center">
+              <Text onClick={() => openEtherScan(txRecipt?.transactionHash)}>
+                {`${etherScanUrl}${formatString(txRecipt?.transactionHash)}`}
+              </Text>
+            </Grid>
+          </Grid.Container>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button flat auto color="error" onPress={() => setSuccessModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
     </>
   );
