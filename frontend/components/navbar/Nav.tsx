@@ -5,7 +5,8 @@ import { connector } from '../../config/connectors';
 import { useWeb3React } from '@web3-react/core';
 import { WalletIcon } from './WalletIcon';
 import useEthBalance from '../../hooks/useEthBalance';
-import Link from 'next/link';
+import { appName } from '../../config/constants'
+
 
 export const Nav = () => {
   const { account, active, activate, deactivate } = useWeb3React();
@@ -30,7 +31,7 @@ export const Nav = () => {
   return (
     <>
       <Navbar isBordered>
-        <Text h1>zkFudosan</Text>
+        <Text h1>{appName}</Text>
 
         <Navbar.Content>
           <Navbar.Link

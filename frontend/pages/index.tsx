@@ -5,18 +5,28 @@ import DefaultLayout from '../components/layouts/DefaultLayout';
 import ListingCard from '../components/card/ListingCard';
 import { useWeb3React } from '@web3-react/core';
 import useGetAllActiveListings from '../hooks/contracts/useGetAllActiveListings';
+import WelcomeModal from '../components/modal/WelcomeModal';
 
 const HomePage: NextPageWithLayout = () => {
+  // Use
   const { active, library } = useWeb3React();
   const { getAllActiveListings, activeListings } = useGetAllActiveListings();
 
-  const [offerListingModal, setOfferListingModal] = useState(false);
+  // State
+  const [offerListingModal, setOfferListingModal] = useState<boolean>(false);
+  const [webcomeModal, setWebcomeModal] = useState<boolean>(false);
 
   useEffect(() => {
     if (active) {
       getAllActiveListings(library.getSigner());
     }
   }, [active]);
+
+  useEffect(() => {
+    if (window.localStorage.getItem('welcome-modal') !== '1') {
+      setWebcomeModal(true)
+    }
+  }, [])
 
   return (
     <>
@@ -100,6 +110,11 @@ const HomePage: NextPageWithLayout = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      <WelcomeModal
+        open={webcomeModal}
+        handlerClose={() => setWebcomeModal(false)}
+      />
     </>
   );
 };
