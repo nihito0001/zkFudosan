@@ -8,7 +8,7 @@ import { zkFudosanTokenAddress } from '../../config/constants';
 
 export interface CreateOfferRequest {
   listingId: string;
-  price: number;
+  price: string;
 }
 
 export interface TxReceipt {
@@ -39,12 +39,15 @@ const useCreateOffer = () => {
         signer
       );
 
-      const value = ethers.utils.parseEther(request.price.toString());
-      const tx = await tokenContract.createOffer(request, { value });
+      // const value = ethers.utils.parseEther(request.price.toString());
+      // console.log(value.toString())
+      const tx = await tokenContract.createOffer(request.listingId, { value: request.price.toString() });
       const txReceipt = await tx.wait();
 
       setTxReceipt(txReceipt);
       setLoading(false);
+
+      return txReceipt
     } catch (error) {
       console.error('Error fetching balance:', error);
       setTxReceipt(null);

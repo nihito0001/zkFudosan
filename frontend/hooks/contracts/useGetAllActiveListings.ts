@@ -23,8 +23,31 @@ const useGetAllActiveListings = () => {
       );
 
       const activeListings = await tokenContract.getAllActiveListings.call();
+      console.log('activeListings', activeListings)
 
-      setActiveListings(activeListings);
+      const output = []
+      for (const listing of activeListings) {
+        if (listing.owner !=='0x0000000000000000000000000000000000000000') {
+          output.push({
+            ...listing,
+          })
+        }
+      }
+
+      // listingsにidを追加
+      const listingsWithId = output.map((listing: any, index: number) => {
+        return {
+          ...listing,
+          id: index,
+        };
+      });
+
+      // listingsWithIdのIDを元にソート
+      const sortedListings = listingsWithId.sort((a: any, b: any) => {
+        return b.id - a.id;
+      });
+
+      setActiveListings(sortedListings);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching balance:', error);
