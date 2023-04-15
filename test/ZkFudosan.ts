@@ -3,6 +3,8 @@ import GetAllActiveListings from "./suites/GetAllActiveListings";
 import GetMyListings from "./suites/GetMyListings";
 import CreateListing from "./suites/CreateListing";
 import CreateOffer from "./suites/CreateOffer";
+import CloseListing from "./suites/CloseListing";
+import CancelListing from "./suites/CancelListing";
 
 describe("ZkFudosan", () => {
   // beforeEach(async () => {
@@ -14,4 +16,6 @@ describe("ZkFudosan", () => {
   describe("GetMyListings", GetMyListings.bind(this));
   describe("CreateListing", CreateListing.bind(this));
   describe("CreateOffer", CreateOffer.bind(this));
+  describe("CloseListing", CloseListing.bind(this));
+  describe("CancelListing", CancelListing.bind(this));
 });
