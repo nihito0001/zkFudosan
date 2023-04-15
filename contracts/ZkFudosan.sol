@@ -30,6 +30,9 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
     // listingId => offerId[]
     mapping(uint256 => uint256[]) private listingOfferIds;
 
+    // array of ListingId
+    uint256[] public allListingIds;
+
     constructor(
         address _defaultAdmin,
         string memory _contractURI,
@@ -75,8 +78,18 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
         return _offers;
     }
 
+    // getAllActiveListings: 全てのリスティングを取得します。
     function getAllActiveListings() external view returns (Listing[] memory) {
-        // 増田さんにきく
+        Listing[] memory _activeListings = new Listing[](allListingIds.length);
+
+        for (uint256 i = 0; i < allListingIds.length; i++) {
+            Listing memory listing = listings[allListingIds[i]];
+            if (listing.listingStatus == ListingStatus.Active) {
+                _activeListings[i] = listing;
+            }
+        }
+
+        return _activeListings;
     }
 
     // createListing: リスティングを作成します。
@@ -107,6 +120,7 @@ contract ZkFudosan is IZkFudosan, ReentrancyGuard, AccessControl {
         // リスティングを保存します。
         listings[listingId] = listing;
         userListingIds[owner].push(listingId);
+        allListingIds.push(listingId);
 
         // リスティングが作成されたことを通知します。
         emit ListingAdded(listingId, owner, listing);
