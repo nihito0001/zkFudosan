@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Dropdown, Navbar, Text, Button, Loading } from '@nextui-org/react';
+import { useRouter } from 'next/router';
 import { connector } from '../../config/connectors';
 import { useWeb3React } from '@web3-react/core';
 import { WalletIcon } from './WalletIcon';
@@ -24,16 +25,18 @@ export const Nav = () => {
     }
   }, [account]);
 
+  const router = useRouter().pathname;
+
   return (
     <>
       <Navbar isBordered>
         <Text h1>zkFudosan</Text>
 
         <Navbar.Content>
-          <Navbar.Link isActive href="/">
+          <Navbar.Link isActive={router === '/'} href="/">
             Listing
           </Navbar.Link>
-          <Navbar.Link href="/Mypage">MyPage</Navbar.Link>
+          <Navbar.Link isActive={router === '/Mypage'} href="/Mypage">MyPage</Navbar.Link>
         </Navbar.Content>
 
         <Navbar.Content>
