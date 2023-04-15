@@ -23,15 +23,17 @@ const ListingDetailModal = (props: any) => {
             Result
           </Text>
         </Modal.Header>
-        <Modal.Body>
-          <Grid.Container gap={2}>
-            <Grid xs={12} justify="center">
-              <Text onClick={() => openEtherScan(recipt?.transactionHash)}>
-                {`${etherScanUrl}${formatLongLengthString(recipt?.transactionHash)}`}
-              </Text>
-            </Grid>
-          </Grid.Container>
-        </Modal.Body>
+        {recipt && (
+          <Modal.Body>
+            <Grid.Container gap={2}>
+              <Grid xs={12} justify="center">
+                <Text onClick={() => openEtherScan(recipt?.transactionHash)}>
+                  {`${etherScanUrl}${formatLongLengthString(recipt?.transactionHash)}`}
+                </Text>
+              </Grid>
+            </Grid.Container>
+          </Modal.Body>
+        )}
         <Modal.Footer>
           <Button flat auto color="error" onPress={() => handlerClose()}>
             Close

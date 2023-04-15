@@ -23,9 +23,21 @@ const useGetMyListings = () => {
       );
 
       const listings = await tokenContract.getMyListings.call();
-      console.log(listings);
 
-      setListings(listings);
+      // listingsにidを追加
+      const listingsWithId = listings.map((listing: any, index: number) => {
+        return {
+          ...listing,
+          id: index,
+        };
+      });
+
+      // listingsWithIdのIDを元にソート
+      const sortedListings = listingsWithId.sort((a: any, b: any) => {
+        return b.id - a.id;
+      });
+
+      setListings(sortedListings);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching balance:', error);

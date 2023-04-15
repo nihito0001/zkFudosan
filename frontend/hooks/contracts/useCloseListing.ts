@@ -36,6 +36,7 @@ const useCloseListing = () => {
 
       const tx = await tokenContract.closeListing(listingId);
       const txRecipt = await tx.wait();
+      console.log('txRecipt', txRecipt)
 
       setTxRecipt(txRecipt);
       setLoading(false);
