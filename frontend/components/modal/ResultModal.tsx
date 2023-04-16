@@ -17,6 +17,7 @@ const ListingDetailModal = (props: any) => {
         preventClose
         open={open}
         onClose={() => handlerClose()}
+        width="sm"
       >
         <Modal.Header>
           <Text id="moal-title" size={18} b>

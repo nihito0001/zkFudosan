@@ -56,9 +56,12 @@ const MyPage: NextPageWithLayout = () => {
   const onSubmit: SubmitHandler<CreateListingRequest> = async (
     data: CreateListingRequest
   ) => {
-    await createListing(data, library.getSigner());
-    setResultRecipt(txRecipt)
+    const recipt = await createListing(data, library.getSigner());
+    setResultRecipt(recipt)
     getMyListings(library.getSigner());
+    setListing(false);
+    setResultModal(true);
+    reset();
   };
 
   const openListingDetailModal = (id: string) => {
@@ -76,14 +79,6 @@ const MyPage: NextPageWithLayout = () => {
     seListingDetailModal(false);
     setResultModal(true);
   };
-
-  useEffect(() => {
-    if (txRecipt) {
-      reset();
-      setListing(false);
-      setResultModal(true);
-    }
-  }, [txRecipt]);
 
   useEffect(() => {
     if (active) {

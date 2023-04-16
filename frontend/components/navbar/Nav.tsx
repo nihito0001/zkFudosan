@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Dropdown, Navbar, Text, Button, Loading } from '@nextui-org/react';
 import { useRouter } from 'next/router';
 import { connector } from '../../config/connectors';
@@ -6,12 +6,25 @@ import { useWeb3React } from '@web3-react/core';
 import { WalletIcon } from './WalletIcon';
 import useEthBalance from '../../hooks/useEthBalance';
 import { appName } from '../../config/constants'
-
+import { ethers } from 'ethers';
 
 export const Nav = () => {
   const { account, active, activate, deactivate } = useWeb3React();
   const { balance, loading, fetchEthBalance } = useEthBalance();
   const router = useRouter();
+
+  const [networkName, setNetworkName] = useState<string>('');
+
+  async function getChainId() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const chainId = await provider.getNetwork().then(network => network.chainId);
+    console.log('Connected to Chain ID:', chainId);
+    if (chainId === 167002) {
+      setNetworkName('Taiko')
+    } else if (chainId === 5) {
+      setNetworkName('Goerli')
+    }
+  }
 
   const formatAccount = (address: string | null | undefined) => {
     if (address) {
@@ -25,6 +38,7 @@ export const Nav = () => {
   useEffect(() => {
     if (account) {
       fetchEthBalance(account);
+      getChainId()
     }
   }, [account]);
 
@@ -71,6 +85,14 @@ export const Nav = () => {
                 color="secondary"
                 onAction={(actionKey) => console.log({ actionKey })}
               >
+                <Dropdown.Item key="balance" css={{ height: '$18' }}>
+                  <Text b color="inherit" css={{ d: 'flex' }}>
+                    Network
+                  </Text>
+                  <Text color="inherit" css={{ d: 'flex' }}>
+                    {networkName}
+                  </Text>
+                </Dropdown.Item>
                 <Dropdown.Item key="balance" css={{ height: '$18' }}>
                   <Text b color="inherit" css={{ d: 'flex' }}>
                     Connected in as

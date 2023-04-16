@@ -42,9 +42,12 @@ const useCreateListing = () => {
 
       const tx = await tokenContract.createListing(request);
       const txRecipt = await tx.wait();
+      console.log(txRecipt)
 
       setTxRecipt(txRecipt);
       setLoading(false);
+
+      return txRecipt
     } catch (error) {
       console.error('Error fetching balance:', error);
       setTxRecipt(null);
